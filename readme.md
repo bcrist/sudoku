@@ -35,6 +35,39 @@ $ zig fetch --save git+https://github.com/bcrist/sudoku
 
 Then in your `build.zig`, add the `sudoku` module as an import to your root module.
 
+Typical usage example:
+
+```zig
+const gpa = std.heap.smp_allocator;
+
+var arena: std.heap.ArenaAllocator = .init(gpa);
+defer arena.deinit();
+
+var b: sudoku.Constraint.Builder = .init(gpa, arena.allocator());
+defer b.deinit();
+
+try b.add_9x9();
+
+var config = try b.build();
+config.init_cell(.init(2, 1), 1);
+config.init_cell(.init(5, 1), 3);
+config.init_cell(.init(9, 1), 9);
+// ...
+
+var stdout_buf: [64]u8 = undefined;
+const w = std.fs.File.stdout().writer(&stdout_buf);
+
+const result = try config.solve(gpa, .default);
+if (result.solution) |solution| {
+    defer result.solution.?.deinit(gpa);
+    try solution.debug(cfg, &w.interface);
+} else {
+    try w.interface.writeAll("No solution found!\n");
+}
+
+try w.interface.flush();
+```
+
 All of the rules that the puzzle must follow are encoded into a [`sudoku.Constraint`](./src/constraint.zig) array and stored in a [`sudoku.Config`](./src/Config.zig) struct.  This includes the basic Sudoku rules (i.e. "Place the digits 1-9 into every row, column, and 3x3 box so that no digit is repeated in any row/column/box") if applicable.  The [`sudoku.Constraint.Builder`](./src/constraint/Builder.zig) struct contains helpers for setting up these constraints.
 
 The [`sudoku.Config`](./src/Config.zig) struct also contains a [`sudoku.State`](./src/State.zig) struct that allows you to set up any given digits.  You can set a given digit with calls to `config.init_cell(.init(x, y), digit);` (note the standard constraints assume 1-based indexing for x and y coordinates).  You could alternatively encode these as constraints (e.g. `try builder.add(.{ .values = .init_range(digit, digit, .single(.{ .offset = .init(x, y) })) });`), but such constraints will never provide any extra information after the first time they're evaluated, so doing it that way will just add extra busywork for the solver.
@@ -43,7 +76,7 @@ To solve the puzzle, in most cases you can just call `const result = config.solv
 
 By default, the solver will stop if it finds more than one solution.  If you want to see how many other solutions there are you can pass `.multi_solution` or a custom `sudoku.Default_Context` to `config.solve`.  The number of solutions will be found in `result.context.counters.solutions`.  Note that severely under-constrained configurations with thousands or millions of solutions may take a long time to solve, so `.multi_solution` will give up after 101 solutions.  The result solution will always just be the first solution found.  If you want to examine all of the solutions, you have to create a custom context with an `on_solution` callback and use `sudoku.State.solve` directly.  For example, to print every solution to `stdout`:
 
-```
+```zig
 const Context = struct {
     pub fn on_solution(self: @This(), cfg: sudoku.Config, solution: sudoku.State, depth: usize) !void {
         _ = self;
