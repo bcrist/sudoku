@@ -84,8 +84,15 @@ pub fn debug(self: State, config: Config, writer: *std.io.Writer) !void {
             const options = self.get(config, .init(x, y));
             try writer.writeByte(switch (options.count()) {
                 0 => ' ',
-                1 => @intCast('0' + options.findFirstSet().?),
-                else => '#',
+                1 => ch: {
+                    const value = options.findFirstSet().?;
+                    break :ch switch (value) {
+                        0...9 => @intCast('0' + value),
+                        10...36 => @intCast('a' + value - 10),
+                        else => '#',
+                    };
+                },
+                else => '?',
             });
         }
         try writer.writeByte('\n');
