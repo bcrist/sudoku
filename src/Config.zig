@@ -84,6 +84,30 @@ pub fn init_cell(self: *Config, cell: Cell, value: u6) void {
     self.initial_state.set(self.*, cell, value);
 }
 
+pub fn init_cells(self: *Config, cell_data: []const u8) void {
+    var cell: Cell = self.bounds.min;
+    for (cell_data) |ch| {
+        if (ch == '\n') {
+            cell.x = self.bounds.min.x;
+            cell.y += 1;
+        } else {
+            switch (ch) {
+                '0'...'9' => {
+                    self.initial_state.set(self.*, cell, @intCast(ch - '0'));
+                },
+                'A'...'Z' => {
+                    self.initial_state.set(self.*, cell, @intCast(ch - 'A' + 10));
+                },
+                'a'...'z' => {
+                    self.initial_state.set(self.*, cell, @intCast(ch - 'a' + 10));
+                },
+                else => {}
+            }
+            cell.x += 1;
+        }
+    }
+}
+
 pub const Solve_Result = struct {
     solution: ?State,
     context: Default_Context,

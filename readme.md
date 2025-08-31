@@ -49,17 +49,24 @@ defer b.deinit();
 try b.add_9x9();
 
 var config = try b.build();
-config.init_cell(.init(2, 1), 1);
-config.init_cell(.init(5, 1), 3);
-config.init_cell(.init(9, 1), 9);
-// ...
+config.init_cells(
+    \\   5  9  
+    \\   6  87 
+    \\4 32 8   
+    \\6      5 
+    \\  9 3 4  
+    \\ 8      7
+    \\   7 46 1
+    \\ 21  9   
+    \\  6  2   
+);
 
 var stdout_buf: [64]u8 = undefined;
 const w = std.fs.File.stdout().writer(&stdout_buf);
 
 const result = try config.solve(gpa, .default);
 if (result.solution) |solution| {
-    defer result.solution.?.deinit(gpa);
+    defer solution.deinit(gpa);
     try solution.debug(cfg, &w.interface);
 } else {
     try w.interface.writeAll("No solution found!\n");
@@ -70,7 +77,10 @@ try w.interface.flush();
 
 All of the rules that the puzzle must follow are encoded into a [`sudoku.Constraint`](./src/constraint.zig) array and stored in a [`sudoku.Config`](./src/Config.zig) struct.  This includes the basic Sudoku rules (i.e. "Place the digits 1-9 into every row, column, and 3x3 box so that no digit is repeated in any row/column/box") if applicable.  The [`sudoku.Constraint.Builder`](./src/constraint/Builder.zig) struct contains helpers for setting up these constraints.
 
-The [`sudoku.Config`](./src/Config.zig) struct also contains a [`sudoku.State`](./src/State.zig) struct that allows you to set up any given digits.  You can set a given digit with calls to `config.init_cell(.init(x, y), digit);` (note the standard constraints assume 1-based indexing for x and y coordinates).  You could alternatively encode these as constraints (e.g. `try builder.add(.{ .values = .init_range(digit, digit, .single(.{ .offset = .init(x, y) })) });`), but such constraints will never provide any extra information after the first time they're evaluated, so doing it that way will just add extra busywork for the solver.
+The [`sudoku.Config`](./src/Config.zig) struct also contains a [`sudoku.State`](./src/State.zig) struct that allows you to set up any given digits.  You can set a given digit with calls to `config.init_cells(string)` or `config.init_cell(.init(x, y), digit);` (note the standard constraints assume 1-based indexing for x and y coordinates).  You could alternatively encode these as constraints:
+```zig
+try builder.add(.{ .values = .init_range(digit, digit, .single(.{ .offset = .init(x, y) })) });
+``` but such constraints will never provide any extra information after the first time they're evaluated, so doing it that way will just add extra busywork for the solver.
 
 To solve the puzzle, in most cases you can just call `const result = config.solve(allocator, .default);`.  If a solution is found, `result.solution` will be non-null, and you can print the solution with `result.solution.?.debug(config, writer)`.  Also note that you will leak memory if you don't call `result.solution.?.deinit(allocator);`.
 

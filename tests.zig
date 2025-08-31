@@ -32,49 +32,17 @@ test "standard sudoku (easy)" {
     try b.add_9x9();
 
     var config = try b.build();
-    config.init_cell(.init(1, 1), 2);
-    config.init_cell(.init(2, 1), 6);
-    config.init_cell(.init(5, 1), 9);
-
-    config.init_cell(.init(2, 2), 5);
-    config.init_cell(.init(4, 2), 3);
-    config.init_cell(.init(8, 2), 1);
-    config.init_cell(.init(9, 2), 7);
-
-    config.init_cell(.init(1, 3), 3);
-    config.init_cell(.init(2, 3), 1);
-    config.init_cell(.init(3, 3), 8);
-    config.init_cell(.init(5, 3), 2);
-    config.init_cell(.init(8, 3), 5);
-
-    config.init_cell(.init(2, 4), 9);
-    config.init_cell(.init(4, 4), 8);
-    config.init_cell(.init(9, 4), 3);
-
-    config.init_cell(.init(2, 5), 7);
-    config.init_cell(.init(3, 5), 2);
-    config.init_cell(.init(5, 5), 3);
-    config.init_cell(.init(7, 5), 5);
-    config.init_cell(.init(8, 5), 8);
-
-    config.init_cell(.init(1, 6), 5);
-    config.init_cell(.init(6, 6), 7);
-    config.init_cell(.init(8, 6), 9);
-
-    config.init_cell(.init(2, 7), 4);
-    config.init_cell(.init(5, 7), 1);
-    config.init_cell(.init(7, 7), 6);
-    config.init_cell(.init(8, 7), 7);
-    config.init_cell(.init(9, 7), 9);
-
-    config.init_cell(.init(1, 8), 7);
-    config.init_cell(.init(2, 8), 2);
-    config.init_cell(.init(6, 8), 6);
-    config.init_cell(.init(8, 8), 4);
-
-    config.init_cell(.init(5, 9), 7);
-    config.init_cell(.init(8, 9), 2);
-    config.init_cell(.init(9, 9), 5);
+    config.init_cells(
+        \\26  9
+        \\ 5 3   17
+        \\318 2  5
+        \\ 9 8    3
+        \\ 72 3 58 
+        \\5    7 9 
+        \\ 4  1 679
+        \\72   6 4 
+        \\    7  25
+    );
     
     const result = try config.solve(std.testing.allocator, .no_backtracks);
     defer result.solution.?.deinit(std.testing.allocator);
@@ -102,36 +70,17 @@ test "standard sudoku (hard)" {
     try b.add_9x9();
 
     var config = try b.build();
-    config.init_cell(.init(4, 1), 5);
-    config.init_cell(.init(7, 1), 9);
-
-    config.init_cell(.init(4, 2), 6);
-    config.init_cell(.init(7, 2), 8);
-    config.init_cell(.init(8, 2), 7);
-
-    config.init_cell(.init(1, 3), 4);
-    config.init_cell(.init(3, 3), 3);
-    config.init_cell(.init(4, 3), 2);
-    config.init_cell(.init(6, 3), 8);
-
-    config.init_cell(.init(1, 4), 6);
-    config.init_cell(.init(8, 4), 5);
-
-    config.init_cell(.init(3, 5), 9);
-    config.init_cell(.init(5, 5), 3);
-    config.init_cell(.init(7, 5), 4);
-
-    config.init_cell(.init(2, 6), 8);
-    config.init_cell(.init(9, 6), 7);
-
-    config.init_cell(.init(4, 7), 7);
-    config.init_cell(.init(6, 7), 4);
-    config.init_cell(.init(7, 7), 6);
-    config.init_cell(.init(9, 7), 1);
-
-    config.init_cell(.init(2, 8), 2);
-    config.init_cell(.init(3, 8), 1);
-    config.init_cell(.init(6, 8), 9);
+    config.init_cells(
+        \\   5  9  
+        \\   6  87 
+        \\4 32 8   
+        \\6      5 
+        \\  9 3 4  
+        \\ 8      7
+        \\   7 46 1
+        \\ 21  9   
+        \\  6  2   
+    );
 
     config.init_cell(.init(3, 9), 6);
     config.init_cell(.init(6, 9), 2);
