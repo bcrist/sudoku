@@ -13,6 +13,12 @@ A zig library that can solve sudoku puzzles, including variants such as:
 * XV
 * Odd/Even cells
 
+Some variants that are _not_ currently supported include:
+
+* Fog-of-war (or any other variant that involves dynamic discovery of additional constraints while solving)
+* Incompletely specified constraints (e.g. "draw a line such that...", etc.)  These could likely be supported with some work, but it's usually harder to write a more generalized form of these constraints.
+* "Wrogn" constraints (where some or all constraints need to be ignored or "inverted" and the solver must deduce which ones are correct)
+
 ## How it works
 The core algorithm used to solve puzzles has two parts:
 1. Evaluate all constraints until no new information is discovered
@@ -112,9 +118,9 @@ As mentioned above, the default solver does not handle severely under-constraine
 
 The [`sudoku.Cell`](./src/Cell.zig) struct acts as a reference to a particular cell in the puzzle (i.e. the things that you write a number into in standard sudoku).  The state of each cell is represented by a 64-bit `std.bit_set.IntegerBitSet`.  This means that puzzles can have up to 64 distinct symbols (i.e. digits).  By convention, the first ten bits (i.e. the least significant bits) represent the digits 0-9, so that arithmetic constraints don't need to do any mapping between symbol indices and values.
 
-Cells are assumed to be located on a 2D grid, and usually they will be in a square or rectangular pattern, so the [`sudoku.Rect`](./src/Rect.zig) struct can be used to refer to any finite rectangle on the infinite, virtual "board".  Cells within the rect can be iterated using `rect.iterator()` or `rect.reverse_iterator()`.
+Cells are assumed to be located on a 2D grid, and usually they will be in a square or rectangular pattern, so the [`sudoku.Rect`](./src/Rect.zig) struct can be used to refer to any finite rectangle on the infinite, virtual "board".  Cells within the rect can be iterated using `rect.iterator()`.
 
-Sometimes it's desirable to refer to non-rectangular regions. (e.g. for Samurai Sudoku, disjoint sets, renban lines, whispers lines, etc.)  A [`sudoku.Region`](./src/Region.zig) struct can either directly store either a single `Rect` (since this is the most common case) or it can store a slice of rects, where the region is considered to be the set of cells that is covered by at least one of the rects.  The cells can be iterated with `region.iterator()` or `region.reverse_iterator()`.  Note if multiple rects cover the same cell, it will only be visited once, and it will be when processing the largest index of the rects array that contains that cell.
+Sometimes it's desirable to refer to non-rectangular regions. (e.g. for Samurai Sudoku, disjoint sets, renban lines, whispers lines, etc.)  A [`sudoku.Region`](./src/Region.zig) struct can either directly store either a single `Rect` (since this is the most common case) or it can store a slice of rects, where the region is considered to be the set of cells that is covered by at least one of the rects.  The cells can be iterated with `region.iterator()`.  Note if multiple rects cover the same cell, it will only be visited once, and it will be when processing the largest index of the rects array that contains that cell.
 
 Most constraints have a `region` field that determines what area of the board they affect.  [Config.init()](./src/Config.zig) will automatically determine the set of cells that at least one of the constraints is interested in, and map it to a slot in the [State.cells](./src/State.zig) array.
 

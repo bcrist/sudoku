@@ -74,14 +74,15 @@ pub fn contains(self: Rect, cell: Cell) bool {
         and self.min.y <= cell.y and self.max.y >= cell.y;
 }
 
-pub fn iterator(self: Rect) Iterator {
-    if (self.width() == 0 or self.height() == 0) return .done;
-    return .{ .rect = self };
-}
-
-pub fn reverse_iterator(self: Rect) Reverse_Iterator {
-    if (self.width() == 0 or self.height() == 0) return .done;
-    return .{ .rect = self, .n = self.max };
+pub fn iterator(self: Rect, dir: Cell.Iteration_Direction) Iterator {
+    return .{
+        .dir = dir,
+        .rect = self,
+        .n = if (self.width() == 0 or self.height() == 0) null else switch (dir) {
+            .forward => self.min,
+            .reverse => self.max,
+        },
+    };
 }
 
 pub const empty: Rect = .{
@@ -95,59 +96,48 @@ pub const origin: Rect = .{
 };
 
 pub const Iterator = struct {
-    rect: Rect,
-    last: ?Cell = null,
-
-    pub fn next(self: *Iterator) ?Cell {
-        const cell: Cell = if (self.last) |last| cell: {
-            var y = last.y;
-            var x = last.x + 1;
-            if (x > self.rect.max.x) {
-                x = self.rect.min.x;
-                y += 1;
-            }
-            if (y > self.rect.max.y) {
-                return null;
-            }
-            break :cell .{
-                .x = x,
-                .y = y,
-            };
-        } else self.rect.min;
-        self.last = cell;
-        return cell;
-    }
-
-    pub const done: Iterator = .{
-        .rect = .origin,
-        .last = .origin,
-    };
-};
-
-pub const Reverse_Iterator = struct {
+    dir: Cell.Iteration_Direction,
     rect: Rect,
     n: ?Cell,
 
-    pub fn next(self: *Reverse_Iterator) ?Cell {
+    pub fn next(self: *Iterator) ?Cell {
         const cell = self.n orelse return null;
         var n = cell;
-        if (n.x == 0) {
-            n.x = self.rect.max.x;
-            if (n.y == 0) {
-                self.n = null;
-                return cell;
-            } else {
-                n.y -= 1;
-            }
-        } else {
-            n.x -= 1;
+        switch (self.dir) {
+            .forward => {
+                if (n.x < self.rect.max.x) {
+                    n.x += 1;
+                } else {
+                    n.x = self.rect.min.x;
+                    if (n.y < self.rect.max.y) {
+                        n.y += 1;
+                    } else {
+                        self.n = null;
+                        return cell;
+                    }
+                }
+            },
+            .reverse => {
+                if (n.x > self.rect.min.x) {
+                    n.x -= 1;
+                } else {
+                    n.x = self.rect.max.x;
+                    if (n.y > self.rect.min.y) {
+                        n.y -= 1;
+                    } else {
+                        self.n = null;
+                        return cell;
+                    }
+                }
+            },
         }
         self.n = n;
         return cell;
     }
 
-    pub const done: Reverse_Iterator = .{
-        .rect = .origin,
+    pub const done: Iterator = .{
+        .dir = .forward,
+        .rect = .empty,
         .n = null,
     };
 };

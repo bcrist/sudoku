@@ -47,14 +47,14 @@ pub fn status(self: State) Solve_Status {
     return .solved;
 }
 
-pub fn get(self: State, config: Config, cell: Cell) Cell.Value_Options {
+pub fn get(self: State, config: *const Config, cell: Cell) Cell.Value_Options {
     const index = config.cell_index(cell);
     const raw = index.maybe_raw() orelse return .initEmpty();
     if (raw >= self.cells.len) return .initEmpty();
     return self.cells[raw];
 }
 
-pub fn set(self: *State, config: Config, cell: Cell, value: u6) void {
+pub fn set(self: *State, config: *const Config, cell: Cell, value: u6) void {
     const index = config.cell_index(cell);
     const raw = index.maybe_raw() orelse return;
     if (raw >= self.cells.len) return;
@@ -66,7 +66,29 @@ pub fn set(self: *State, config: Config, cell: Cell, value: u6) void {
     }
 }
 
-pub fn intersect(self: *State, config: Config, cell: Cell, options: Cell.Value_Options) void {
+pub fn set_options(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) void {
+    const index = config.cell_index(cell);
+    const raw = index.maybe_raw() orelse return;
+    if (raw >= self.cells.len) return;
+    if (!options.eql(self.cells[raw])) {
+        self.cells[raw] = options;
+        self.modified = true;
+    }
+}
+
+pub fn set_union(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) void {
+    const index = config.cell_index(cell);
+    const raw = index.maybe_raw() orelse return;
+    if (raw >= self.cells.len) return;
+    const old = self.cells[raw];
+    const new = old.unionWith(options);
+    if (!new.eql(old)) {
+        self.cells[raw] = new;
+        self.modified = true;
+    }
+}
+
+pub fn intersect(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) void {
     const index = config.cell_index(cell);
     const raw = index.maybe_raw() orelse return;
     if (raw >= self.cells.len) return;
@@ -78,28 +100,17 @@ pub fn intersect(self: *State, config: Config, cell: Cell, options: Cell.Value_O
     }
 }
 
-pub fn debug(self: State, config: Config, writer: *std.io.Writer) !void {
+pub fn debug(self: State, config: *const Config, writer: *std.io.Writer) !void {
     for (config.bounds.min.y .. config.bounds.max.y + 1) |y| {
         for (config.bounds.min.x .. config.bounds.max.x + 1) |x| {
             const options = self.get(config, .init(x, y));
-            try writer.writeByte(switch (options.count()) {
-                0 => ' ',
-                1 => ch: {
-                    const value = options.findFirstSet().?;
-                    break :ch switch (value) {
-                        0...9 => @intCast('0' + value),
-                        10...36 => @intCast('a' + value - 10),
-                        else => '#',
-                    };
-                },
-                else => '?',
-            });
+            try writer.writeByte(Cell.debug_options(options));
         }
         try writer.writeByte('\n');
     }
 }
 
-pub fn debug_full(self: State, config: Config, writer: *std.io.Writer) !void {
+pub fn debug_full(self: State, config: *const Config, writer: *std.io.Writer) !void {
     for (config.bounds.min.y .. config.bounds.max.y + 1) |y| {
         for (config.bounds.min.x .. config.bounds.max.x + 1) |x| {
             const options = self.get(config, .init(x, y));
@@ -109,7 +120,7 @@ pub fn debug_full(self: State, config: Config, writer: *std.io.Writer) !void {
     }
 }
 
-pub fn solve(self: *State, allocator: std.mem.Allocator, config: Config, ctx: anytype) !Solve_Status {
+pub fn solve(self: *State, allocator: std.mem.Allocator, config: *const Config, ctx: anytype) !Solve_Status {
     const Wrapper = Context_Wrapper(@TypeOf(ctx));
     var wrapped: Wrapper = try .init(allocator, config.num_cells, ctx);
     defer wrapped.deinit(allocator);
@@ -163,7 +174,7 @@ pub fn solve(self: *State, allocator: std.mem.Allocator, config: Config, ctx: an
     return if (wrapped.solution.modified) .solved else .unsolved;
 }
 
-fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: Config, comptime Inner: type, ctx: *Context_Wrapper(Inner), maybe_rnd: ?std.Random) !void {
+fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Config, comptime Inner: type, ctx: *Context_Wrapper(Inner), maybe_rnd: ?std.Random) !void {
     ctx.depth += 1;
     defer ctx.depth -= 1;
 
@@ -256,7 +267,7 @@ fn Context_Wrapper(comptime Inner: type) type {
             self.solution.deinit(allocator);
         }
 
-        pub fn on_solution(self: *First_Solution_Self, config: Config, state: State) !void {
+        pub fn on_solution(self: *First_Solution_Self, config: *const Config, state: State) !void {
             if (!self.solution.modified) {
                 @memcpy(self.solution.cells, state.cells);
                 self.solution.modified = true;
@@ -267,19 +278,19 @@ fn Context_Wrapper(comptime Inner: type) type {
             }
         }
 
-        pub fn on_backtrack(self: *First_Solution_Self, config: Config, state: State) !void {
+        pub fn on_backtrack(self: *First_Solution_Self, config: *const Config, state: State) !void {
             if (@hasDecl(Context, "on_backtrack")) {
                 return self.inner.on_backtrack(config, state, self.depth);
             }
         }
 
-        pub fn on_evaluation(self: *First_Solution_Self, config: Config, state: State) !void {
+        pub fn on_evaluation(self: *First_Solution_Self, config: *const Config, state: State) !void {
             if (@hasDecl(Context, "on_evaluation")) {
                 return self.inner.on_evaluation(config, state, self.depth);
             }
         }
 
-        pub fn on_bifurcation(self: *First_Solution_Self, config: Config, state: State, branch_factor: usize) !void {
+        pub fn on_bifurcation(self: *First_Solution_Self, config: *const Config, state: State, branch_factor: usize) !void {
             if (@hasDecl(Context, "on_bifurcation")) {
                 return self.inner.on_bifurcation(config, state, self.depth, branch_factor);
             }

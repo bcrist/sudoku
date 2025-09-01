@@ -5,23 +5,25 @@ pub const Constraint = union (enum) {
     values: Values,
     unique_region: Unique_Region,
     sum_region: Sum_Region,
-    equal_sum_regions: Equal_Sum_Regions,
-    equal_cells: Equal_Cells,
-    ascending_sum_regions: Ascending_Sum_Regions,
-    ascending_cells: Ascending_Cells,
-    consecutive_region: Consecutive_Region,
-    ratio_cells: Ratio_Cells,
-    unique_pairs_rect: misc.Unique_Pairs_Rect,
-    anti_knight_region: Anti_Knight_Region,
-    anti_king_region: Anti_King_Region,
+    sum_between_sentinels: Sum_Between_Sentinels,
+    //equal_sum_regions: Equal_Sum_Regions,
+    //equal_cells: Equal_Cells,
+    //ascending_sum_regions: Ascending_Sum_Regions,
+    //ascending_cells: Ascending_Cells,
+    //consecutive_region: Consecutive_Region,
+    //ratio_cells: Ratio_Cells,
+    //anti_knight_region: Anti_Knight_Region,
+    //anti_king_region: Anti_King_Region,
     white_kropki: kropki.White,
     black_kropki: kropki.Black,
     xv_x: xv.X,
     xv_v: xv.V,
+    unique_pairs_rect: misc.Unique_Pairs_Rect,
 
     pub const Values = @import("constraint/Values.zig");
     pub const Unique_Region = @import("constraint/Unique_Region.zig");
     pub const Sum_Region = @import("constraint/Sum_Region.zig");
+    pub const Sum_Between_Sentinels = @import("constraint/Sum_Between_Sentinels.zig");
     pub const Equal_Sum_Regions = @import("constraint/Equal_Sum_Regions.zig");
     pub const Equal_Cells = @import("constraint/Equal_Cells.zig");
     pub const Ascending_Sum_Regions = @import("constraint/Ascending_Sum_Regions.zig");
@@ -40,7 +42,7 @@ pub const Constraint = union (enum) {
     // TODO entropic lines
     // TODO parity lines
     // TODO Corner Dots
-    // TODO X Sums/Sandwich/Skyscraper
+    // TODO X Sums/Skyscraper
     // TODO Row/Column/Box indexing
 
     pub fn num_regions(self: Constraint) usize {
@@ -68,7 +70,7 @@ pub const Constraint = union (enum) {
         }
     }
 
-    pub fn evaluate(self: Constraint, config: Config, state: *State) Solve_Status {
+    pub fn evaluate(self: Constraint, config: *const Config, state: *State) Solve_Status {
         return switch (self) {
             inline else => |c| c.evaluate(config, state),
         };

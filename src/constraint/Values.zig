@@ -70,9 +70,9 @@ pub fn init_non_fib(region: Region) Values {
     };
 }
 
-pub fn evaluate(self: Values, config: Config, state: *State) State.Solve_Status {
+pub fn evaluate(self: Values, config: *const Config, state: *State) State.Solve_Status {
     const values = self.values;
-    var iter = self.region.iterator();
+    var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
         state.intersect(config, cell, values);
     }

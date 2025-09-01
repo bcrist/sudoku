@@ -21,12 +21,12 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
         return min * 64 + max;
     }
 
-    pub fn evaluate(self: @This(), params: base.Orthogonally_Adjacent_Dots_Params, config: Config, state: *State) State.Solve_Status {
+    pub fn evaluate(self: @This(), params: base.Orthogonally_Adjacent_Dots_Params, config: *const Config, state: *State) State.Solve_Status {
         var result: State.Solve_Status = .unsolved;
 
         var permutations: Permutations = .initEmpty();
 
-        var iter = params.rect.iterator();
+        var iter = params.rect.iterator(.forward);
         while (iter.next()) |cell| {
             if (cell.x < params.rect.max.x) {
                 const other_cell: Cell = .init(cell.x + 1, cell.y);
@@ -47,7 +47,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
             }
         }
 
-        iter = params.rect.iterator();
+        iter = params.rect.iterator(.forward);
         while (iter.next()) |cell| {
             if (cell.x < params.rect.max.x) {
                 const other_cell: Cell = .init(cell.x + 1, cell.y);
@@ -67,7 +67,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
         return result;
     }
     
-    fn check_and_collect_permutation(self: @This(), config: Config, state: *State, a: Cell, b: Cell, permutations: *Permutations) State.Solve_Status {
+    fn check_and_collect_permutation(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: *Permutations) State.Solve_Status {
         const a_options = state.get(config, a);
         const b_options = state.get(config, b);
 
@@ -85,7 +85,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
         return .unsolved;
     }
 
-    fn try_update_options(self: @This(), config: Config, state: *State, a: Cell, b: Cell, permutations: Permutations) void {
+    fn try_update_options(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: Permutations) void {
         var a_options = state.get(config, a);
         var b_options = state.get(config, b);
 
@@ -99,7 +99,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
         }
     }
 
-    fn update_options(self: @This(), config: Config, state: *State, cell: Cell, cell_options: Cell.Value_Options, fixed_value: usize, permutations: Permutations) void {
+    fn update_options(self: @This(), config: *const Config, state: *State, cell: Cell, cell_options: Cell.Value_Options, fixed_value: usize, permutations: Permutations) void {
         var options = cell_options;
 
         var iter = cell_options.iterator(.{});

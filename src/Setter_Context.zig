@@ -32,7 +32,7 @@ const Init_Options = struct {
     max_stochastic_backtracks: usize = 100_000,
 };
 
-pub fn init(allocator: std.mem.Allocator, config: Config, options: Init_Options) !Setter_Context {
+pub fn init(allocator: std.mem.Allocator, config: *const Config, options: Init_Options) !Setter_Context {
     return .{
         .solutions = try .init_empty(allocator, config.num_cells),
         .found_all_solutions = false,
@@ -48,7 +48,7 @@ pub fn deinit(self: Setter_Context, allocator: std.mem.Allocator) void {
     self.solutions.deinit(allocator);
 }
 
-pub fn on_solution(self: *Setter_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_solution(self: *Setter_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     self.counters.solutions += 1;
     self.counters.max_depth = @max(self.counters.max_depth, depth);
@@ -62,7 +62,7 @@ pub fn on_solution(self: *Setter_Context, config: Config, state: State, depth: u
     }
 }
 
-pub fn on_backtrack(self: *Setter_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_backtrack(self: *Setter_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     _ = state;
     self.counters.backtracks += 1;
@@ -73,14 +73,14 @@ pub fn on_backtrack(self: *Setter_Context, config: Config, state: State, depth: 
     }
 }
 
-pub fn on_evaluation(self: *Setter_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_evaluation(self: *Setter_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     _ = state;
     _ = depth;
     self.counters.evaluations += 1;
 }
 
-pub fn on_bifurcation(self: *Setter_Context, config: Config, state: State, depth: usize, branch_factor: usize) !void {
+pub fn on_bifurcation(self: *Setter_Context, config: *const Config, state: State, depth: usize, branch_factor: usize) !void {
     _ = config;
     _ = state;
     _ = depth;

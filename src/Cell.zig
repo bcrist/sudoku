@@ -20,9 +20,46 @@ pub fn expand_bounds(self: Cell, bounds: *Rect) void {
     }
 }
 
+pub fn options(debug: []const u8) Value_Options {
+    var o: Value_Options = .initEmpty();
+    for (debug) |ch| switch (ch) {
+        '0'...'9' => o.set(ch - '0'),
+        'a'...'z' => o.set(ch - 'a' + 10),
+        'A'...'Z' => o.set(ch - 'A' + 36),
+        '@' => o.set(62),
+        '#' => o.set(63),
+        else => o = .initFull(),
+    };
+    return o;
+}
+
+pub fn debug_options(o: Value_Options) u8 {
+    return switch (o.count()) {
+        0 => ' ',
+        1 => ch: {
+            const value = o.findFirstSet().?;
+            break :ch switch (value) {
+                0...9 => @intCast('0' + value),
+                10...35 => @intCast('a' + value - 10),
+                36...61 => @intCast('A' + value - 36),
+                62 => '@',
+                63 => '#',
+                else => unreachable,
+            };
+        },
+        64 => '*',
+        else => '?',
+    };
+}
+
 pub const origin: Cell = .init(0, 0);
 
 pub const Value_Options = std.bit_set.IntegerBitSet(64);
+
+pub const Iteration_Direction = enum {
+    forward, // left-to-right, top-to-bottom
+    reverse, // right-to-left, bottom-to-top
+};
 
 pub const Index = enum (u32) {
     invalid = 0xFFFF_FFFF,

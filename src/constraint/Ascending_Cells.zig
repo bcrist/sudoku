@@ -5,7 +5,7 @@
 
 region: Region,
         
-pub fn evaluate(self: @This(), config: Config, state: *State) State.Solve_Status {
+pub fn evaluate(self: @This(), config: *const Config, state: *State) State.Solve_Status {
     _ = self;
     _ = config;
     _ = state;

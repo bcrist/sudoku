@@ -29,7 +29,7 @@ pub fn get_region(self: Ratio_Cells, region: usize) Region {
     }});
 }
 
-pub fn evaluate(self: Ratio_Cells, config: Config, state: *State) State.Solve_Status {
+pub fn evaluate(self: Ratio_Cells, config: *const Config, state: *State) State.Solve_Status {
     _ = self;
     _ = config;
     _ = state;

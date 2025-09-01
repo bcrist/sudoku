@@ -2,6 +2,8 @@
 //! This is used for all of the standard sudoku rules (i.e. "digits 1-9 appear exactly once in each row, column, and 3x3 box")
 //! It can also be used for irregular sudoku, diagonals, multi/samurai sudoku, disjoint sets, etc.
 //! Note the region may be smaller than the cardinality of the set of values that can go in the region
+//! 
+//! TODO detect when cardinality of options remaining == number of cells in range -- look for values that only appear in one cell
 
 region: Region,
 
@@ -82,12 +84,12 @@ pub fn box_16x16(box: usize) Unique_Region {
     }})};
 }
 
-pub fn evaluate(self: Unique_Region, config: Config, state: *State) State.Solve_Status {
-    var iter = self.region.iterator();
+pub fn evaluate(self: Unique_Region, config: *const Config, state: *State) State.Solve_Status {
+    var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
         const options = state.get(config, cell);
         if (options.count() == 1) {
-            var iter2 = self.region.iterator();
+            var iter2 = self.region.iterator(.forward);
             while (iter2.next()) |cell2| {
                 if (!std.meta.eql(cell, cell2)) {
                     state.intersect(config, cell2, options.complement());

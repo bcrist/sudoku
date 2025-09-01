@@ -36,7 +36,7 @@ pub const no_backtracks: Default_Context = .{
     .max_backtracks = 0,
 };
 
-pub fn on_solution(self: *Default_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_solution(self: *Default_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     _ = state;
     self.counters.solutions += 1;
@@ -47,7 +47,7 @@ pub fn on_solution(self: *Default_Context, config: Config, state: State, depth: 
     }
 }
 
-pub fn on_backtrack(self: *Default_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_backtrack(self: *Default_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     _ = state;
     self.counters.backtracks += 1;
@@ -58,14 +58,14 @@ pub fn on_backtrack(self: *Default_Context, config: Config, state: State, depth:
     }
 }
 
-pub fn on_evaluation(self: *Default_Context, config: Config, state: State, depth: usize) !void {
+pub fn on_evaluation(self: *Default_Context, config: *const Config, state: State, depth: usize) !void {
     _ = config;
     _ = state;
     _ = depth;
     self.counters.evaluations += 1;
 }
 
-pub fn on_bifurcation(self: *Default_Context, config: Config, state: State, depth: usize, branch_factor: usize) !void {
+pub fn on_bifurcation(self: *Default_Context, config: *const Config, state: State, depth: usize, branch_factor: usize) !void {
     _ = config;
     _ = state;
     _ = depth;

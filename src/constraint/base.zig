@@ -64,14 +64,14 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
             return .single(.{ .rect = self.params.rect });
         }
 
-        pub fn evaluate(self: Self, config: Config, state: *State) State.Solve_Status {
+        pub fn evaluate(self: Self, config: *const Config, state: *State) State.Solve_Status {
             if (@hasDecl(Impl, "evaluate")) {
                 return self.impl.evaluate(self.params, config, state);
             }
 
             var result: State.Solve_Status = .unsolved;
 
-            var iter = self.params.rect.iterator();
+            var iter = self.params.rect.iterator(.forward);
             while (iter.next()) |cell| {
                 if (cell.x < self.params.rect.max.x) {
                     const other_cell: Cell = .init(cell.x + 1, cell.y);
@@ -113,7 +113,7 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
             return result;
         }
 
-        pub fn default_evaluate(self: Self, config: Config, state: *State, a: Cell, b: Cell, has_dot: bool) State.Solve_Status {
+        pub fn default_evaluate(self: Self, config: *const Config, state: *State, a: Cell, b: Cell, has_dot: bool) State.Solve_Status {
             const a_options = state.get(config, a);
             const b_options = state.get(config, b);
 
@@ -138,11 +138,11 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
             return .unsolved;
         }
 
-        fn update_cell_options(self: Self, config: Config, state: *State, cell: Cell, has_dot: bool, adjacent_value: usize) void {
+        fn update_cell_options(self: Self, config: *const Config, state: *State, cell: Cell, has_dot: bool, adjacent_value: usize) void {
             state.intersect(config, cell, self.impl.get_options(self.params, config, state, cell, has_dot, adjacent_value));
         }
     
-        fn update_cell_options_multi(self: Self, config: Config, state: *State, cell: Cell, has_dot: bool, adjacent_options: Cell.Value_Options) void {
+        fn update_cell_options_multi(self: Self, config: *const Config, state: *State, cell: Cell, has_dot: bool, adjacent_options: Cell.Value_Options) void {
             var new_options: Cell.Value_Options = .initEmpty();
             var iter = adjacent_options.iterator(.{});
             while (iter.next()) |adjacent_value| {
@@ -200,6 +200,79 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
         return (self.rect.height() - 1) * offset_x + offset_y;
     }
 };
+
+pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytype, sum: usize) State.Solve_Status {
+    const has_abort = @hasField(@TypeOf(iterator), "abort");
+    const has_last_options = @hasField(@TypeOf(iterator), "last_options");
+
+    var min: u64 = 0;
+    var max: u64 = 0;
+
+    var iter = iterator;
+    while (iter.next()) |cell| {
+        const options = if (has_last_options) iter.last_options else state.get(config, cell);
+        min += options.findFirstSet() orelse 0;
+        max += options.findLastSet() orelse 0;
+    }
+    if (has_abort and iter.abort) return .unsolved;
+
+    if (min == max) {
+        return if (min == sum) .unsolved else .not_solvable;
+    }
+
+    if (min == sum) {
+        iter = iterator;
+        while (iter.next()) |cell| {
+            var options = if (has_last_options) iter.last_options else state.get(config, cell);
+            const value = options.findFirstSet() orelse 0;
+            options = .initEmpty();
+            options.set(value);
+            state.intersect(config, cell, options);
+        }
+        return .unsolved;
+    } else if (min > sum) return .not_solvable;
+
+    if (max == sum) {
+        iter = iterator;
+        while (iter.next()) |cell| {
+            var options = if (has_last_options) iter.last_options else state.get(config, cell);
+            const value = options.findLastSet() orelse 0;
+            options = .initEmpty();
+            options.set(value);
+            state.intersect(config, cell, options);
+        }
+        return .unsolved;
+    } else if (max < sum) return .not_solvable;
+
+    iter = iterator;
+    while (iter.next()) |cell| {
+        var options = if (has_last_options) iter.last_options else state.get(config, cell);
+        if (options.count() <= 1) continue;
+
+        const cell_min = options.findFirstSet().?;
+        const cell_max = options.findLastSet().?;
+
+        const min_of_others = min - cell_min;
+        const max_of_others = max - cell_max;
+
+        if (max_of_others + cell_min < sum) {
+            const new_min = sum - max_of_others;
+            for (cell_min..new_min) |v| {
+                options.unset(v);
+            }
+            state.intersect(config, cell, options);
+        }
+
+        if (min_of_others + cell_max > sum) {
+            const new_max = sum - @min(sum, min_of_others);
+            for (new_max..cell_max) |v| {
+                options.unset(v + 1);
+            }
+            state.intersect(config, cell, options);
+        }
+    }
+    return .unsolved;
+}
 
 const Cell = @import("../Cell.zig");
 const Region = @import("../region.zig").Region;

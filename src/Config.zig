@@ -26,7 +26,7 @@ pub fn init(allocator: std.mem.Allocator, constraints: []const Constraint) !Conf
 
     for (constraints) |c| {
         for (0..c.num_regions()) |region| {
-            var iter = c.get_region(region).iterator();
+            var iter = c.get_region(region).iterator(.forward);
             while (iter.next()) |cell| {
                 const index = self.cell_map_index(cell);
                 if (cell_map[index] == .invalid) {
@@ -52,7 +52,7 @@ pub fn init(allocator: std.mem.Allocator, constraints: []const Constraint) !Conf
 
         for (constraints) |c| {
             for (0..c.num_regions()) |region| {
-                var iter = c.get_region(region).iterator();
+                var iter = c.get_region(region).iterator(.forward);
                 while (iter.next()) |cell| {
                     const index = cell_map[self.cell_map_index(cell)].raw();
                     cell_strength[index].cell = cell;
@@ -75,13 +75,13 @@ pub fn init(allocator: std.mem.Allocator, constraints: []const Constraint) !Conf
     return self;
 }
 
-pub fn deinit(self: Config, allocator: std.mem.Allocator) void {
+pub fn deinit(self: *const Config, allocator: std.mem.Allocator) void {
     self.initial_state.deinit(allocator);
     allocator.free(self.cell_map);
 }
 
 pub fn init_cell(self: *Config, cell: Cell, value: u6) void {
-    self.initial_state.set(self.*, cell, value);
+    self.initial_state.set(self, cell, value);
 }
 
 pub fn init_cells(self: *Config, cell_data: []const u8) void {
@@ -91,18 +91,7 @@ pub fn init_cells(self: *Config, cell_data: []const u8) void {
             cell.x = self.bounds.min.x;
             cell.y += 1;
         } else {
-            switch (ch) {
-                '0'...'9' => {
-                    self.initial_state.set(self.*, cell, @intCast(ch - '0'));
-                },
-                'A'...'Z' => {
-                    self.initial_state.set(self.*, cell, @intCast(ch - 'A' + 10));
-                },
-                'a'...'z' => {
-                    self.initial_state.set(self.*, cell, @intCast(ch - 'a' + 10));
-                },
-                else => {}
-            }
+            self.initial_state.set_options(self, cell, Cell.options(&.{ ch }));
             cell.x += 1;
         }
     }
@@ -113,7 +102,7 @@ pub const Solve_Result = struct {
     context: Default_Context,
 };
 
-pub fn solve(self: Config, allocator: std.mem.Allocator, context: Default_Context) !Solve_Result {
+pub fn solve(self: *const Config, allocator: std.mem.Allocator, context: Default_Context) !Solve_Result {
     var ctx = context;
     var state = try self.initial_state.clone(allocator);
     switch (try state.solve(allocator, self, &ctx)) {
@@ -133,14 +122,14 @@ pub fn solve(self: Config, allocator: std.mem.Allocator, context: Default_Contex
     }
 }
 
-pub fn cell_index(self: Config, cell: Cell) Cell.Index {
+pub fn cell_index(self: *const Config, cell: Cell) Cell.Index {
     if (!self.bounds.contains(cell)) return .invalid;
     const map_index = self.cell_map_index(cell);
     if (map_index >= self.cell_map.len) return .invalid;
     return self.cell_map[map_index];
 }
 
-fn cell_map_index(self: Config, cell: Cell) usize {
+fn cell_map_index(self: *const Config, cell: Cell) usize {
     return (cell.y - self.bounds.min.y) * self.bounds.width() + (cell.x - self.bounds.min.x);
 }
 
