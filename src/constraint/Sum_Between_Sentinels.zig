@@ -26,8 +26,8 @@ pub fn init(sum: u64, region: Region, options: Init_Options) Sum_Between_Sentine
     };
 }
 
-pub fn evaluate(self: Sum_Between_Sentinels, config: *const Config, state: *State) State.Solve_Status {
-    return base.evaluate_sum_cells(config, state, self.iterator(config, state), self.sum);
+pub fn evaluate(self: Sum_Between_Sentinels, config: *const Config, state: *State) error{NotSolvable}!void {
+    try base.evaluate_sum_cells(config, state, self.iterator(config, state), self.sum);
 }
 
 fn iterator(self: Sum_Between_Sentinels, config: *const Config, state: *const State) Iterator {

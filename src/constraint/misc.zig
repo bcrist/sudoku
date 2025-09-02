@@ -21,7 +21,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
         return min * 64 + max;
     }
 
-    pub fn evaluate(self: @This(), params: base.Orthogonally_Adjacent_Dots_Params, config: *const Config, state: *State) State.Solve_Status {
+    pub fn evaluate(self: @This(), params: base.Orthogonally_Adjacent_Dots_Params, config: *const Config, state: *State) error{NotSolvable}!void {
         var result: State.Solve_Status = .unsolved;
 
         var permutations: Permutations = .initEmpty();
@@ -31,18 +31,18 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
             if (cell.x < params.rect.max.x) {
                 const other_cell: Cell = .init(cell.x + 1, cell.y);
                 if (params.horizontal_dots.isSet(params.horizontal_index(cell))) {
-                    if (self.check_and_collect_permutation(config, state, cell, other_cell, &permutations) == .not_solvable) {
+                    self.check_and_collect_permutation(config, state, cell, other_cell, &permutations) catch {
                         result = .not_solvable;
-                    }
+                    };
                 }
             }
 
             if (cell.y < params.rect.max.y) {
                 const other_cell: Cell = .init(cell.x, cell.y + 1);
                 if (params.vertical_dots.isSet(params.vertical_index(cell))) {
-                    if (self.check_and_collect_permutation(config, state, cell, other_cell, &permutations) == .not_solvable) {
+                    self.check_and_collect_permutation(config, state, cell, other_cell, &permutations) catch {
                         result = .not_solvable;
-                    }
+                    };
                 }
             }
         }
@@ -64,10 +64,10 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
             }
         }
 
-        return result;
+        if (result == .not_solvable) return error.NotSolvable;
     }
     
-    fn check_and_collect_permutation(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: *Permutations) State.Solve_Status {
+    fn check_and_collect_permutation(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: *Permutations) error{NotSolvable}!void {
         const a_options = state.get(config, a);
         const b_options = state.get(config, b);
 
@@ -77,12 +77,10 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
 
             const index = self.permutation_index(a_value, b_value);
 
-            if (permutations.isSet(index)) return .not_solvable;
+            if (permutations.isSet(index)) return error.NotSolvable;
 
             permutations.set(index);
         }
-
-        return .unsolved;
     }
 
     fn try_update_options(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: Permutations) void {

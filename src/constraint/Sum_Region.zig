@@ -12,8 +12,8 @@ pub fn init(sum: u64, region: Region) Sum_Region {
     };
 }
 
-pub fn evaluate(self: Sum_Region, config: *const Config, state: *State) State.Solve_Status {
-    return base.evaluate_sum_cells(config, state, self.region.iterator(.forward), self.sum);
+pub fn evaluate(self: Sum_Region, config: *const Config, state: *State) error{NotSolvable}!void {
+    try base.evaluate_sum_cells(config, state, self.region.iterator(.forward), self.sum);
 }
 
 const Sum_Region = @This();

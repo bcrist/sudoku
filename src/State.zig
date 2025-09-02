@@ -183,11 +183,11 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
         self.modified = false;
 
         for (config.constraints) |c| {
-            if (c.evaluate(config, self) == .not_solvable) {
+            c.evaluate(config, self) catch |err| {
                 try ctx.on_evaluation(config, self.*);
-                try ctx.on_backtrack(config, self.*);
+                try ctx.on_backtrack(config, self.*, err);
                 return;
-            }
+            };
         }
 
         try ctx.on_evaluation(config, self.*);
@@ -195,7 +195,7 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
     
     switch (self.status()) {
         .solved => try ctx.on_solution(config, self.*),
-        .not_solvable => try ctx.on_backtrack(config, self.*),
+        .not_solvable => try ctx.on_backtrack(config, self.*, error.NotSolvable),
         .unsolved => if (maybe_rnd) |rnd| {
             const unsolved_cell: usize = for (0..100) |_| {
                 const i = rnd.intRangeLessThan(usize, 0, self.cells.len);
@@ -278,9 +278,9 @@ fn Context_Wrapper(comptime Inner: type) type {
             }
         }
 
-        pub fn on_backtrack(self: *First_Solution_Self, config: *const Config, state: State) !void {
+        pub fn on_backtrack(self: *First_Solution_Self, config: *const Config, state: State, err: anyerror) !void {
             if (@hasDecl(Context, "on_backtrack")) {
-                return self.inner.on_backtrack(config, state, self.depth);
+                return self.inner.on_backtrack(config, state, self.depth, err);
             }
         }
 

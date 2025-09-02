@@ -64,9 +64,9 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
             return .single(.{ .rect = self.params.rect });
         }
 
-        pub fn evaluate(self: Self, config: *const Config, state: *State) State.Solve_Status {
+        pub fn evaluate(self: Self, config: *const Config, state: *State) error{NotSolvable}!void {
             if (@hasDecl(Impl, "evaluate")) {
-                return self.impl.evaluate(self.params, config, state);
+                return try self.impl.evaluate(self.params, config, state);
             }
 
             var result: State.Solve_Status = .unsolved;
@@ -78,13 +78,13 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
                     const has_dot = self.params.horizontal_dots.isSet(self.params.horizontal_index(cell));
 
                     if (@hasDecl(Impl, "evaluate_horizontal")) {
-                        if (self.impl.evaluate_horizontal(self.params, config, state, cell, other_cell, has_dot) == .not_solvable) {
+                        self.impl.evaluate_horizontal(self.params, config, state, cell, other_cell, has_dot) catch {
                             result = .not_solvable;
-                        }
+                        };
                     } else {
-                        if (self.default_evaluate(config, state, cell, other_cell, has_dot) == .not_solvable) {
+                        self.default_evaluate(config, state, cell, other_cell, has_dot) catch {
                             result = .not_solvable;
-                        }
+                        };
                     }
                 }
 
@@ -93,27 +93,25 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
                     const has_dot = self.params.vertical_dots.isSet(self.params.vertical_index(cell));
 
                     if (@hasDecl(Impl, "evaluate_vertical")) {
-                        if (self.impl.evaluate_vertical(self.params, config, state, cell, other_cell, has_dot) == .not_solvable) {
+                        self.impl.evaluate_vertical(self.params, config, state, cell, other_cell, has_dot) catch {
                             result = .not_solvable;
-                        }
+                        };
                     } else {
-                        if (self.default_evaluate(config, state, cell, other_cell, has_dot) == .not_solvable) {
+                        self.default_evaluate(config, state, cell, other_cell, has_dot) catch {
                             result = .not_solvable;
-                        }
+                        };
                     }
                 }
             }
 
             if (@hasDecl(Impl, "evaluate_extra")) {
-                if (self.impl.evaluate_extra(self.params, config, state) == .not_solvable) {
-                    result = .not_solvable;
-                }
+                try self.impl.evaluate_extra(self.params, config, state);
             }
 
-            return result;
+            if (result == .not_solvable) return error.NotSolvable;
         }
 
-        pub fn default_evaluate(self: Self, config: *const Config, state: *State, a: Cell, b: Cell, has_dot: bool) State.Solve_Status {
+        pub fn default_evaluate(self: Self, config: *const Config, state: *State, a: Cell, b: Cell, has_dot: bool) error{NotSolvable}!void {
             const a_options = state.get(config, a);
             const b_options = state.get(config, b);
 
@@ -121,9 +119,7 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
                 const a_value = a_options.findFirstSet().?;
                 if (b_options.count() == 1) {
                     const b_value = b_options.findFirstSet().?;
-                    if (self.impl.validate_cells(self.params, config, state, a, b, has_dot, a_value, b_value) == .not_solvable) {
-                        return .not_solvable;
-                    }
+                    try self.impl.validate_cells(self.params, config, state, a, b, has_dot, a_value, b_value);
                 } else {
                     self.update_cell_options(config, state, b, has_dot, a_value);
                 }
@@ -134,8 +130,6 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
                 self.update_cell_options_multi(config, state, a, has_dot, b_options);
                 self.update_cell_options_multi(config, state, b, has_dot, a_options);
             }
-
-            return .unsolved;
         }
 
         fn update_cell_options(self: Self, config: *const Config, state: *State, cell: Cell, has_dot: bool, adjacent_value: usize) void {
@@ -201,7 +195,7 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
     }
 };
 
-pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytype, sum: usize) State.Solve_Status {
+pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytype, sum: usize) error{NotSolvable}!void {
     const has_abort = @hasField(@TypeOf(iterator), "abort");
     const has_last_options = @hasField(@TypeOf(iterator), "last_options");
 
@@ -214,10 +208,11 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
         min += options.findFirstSet() orelse 0;
         max += options.findLastSet() orelse 0;
     }
-    if (has_abort and iter.abort) return .unsolved;
+    if (has_abort and iter.abort) return;
 
     if (min == max) {
-        return if (min == sum) .unsolved else .not_solvable;
+        if (min == sum) return;
+        return error.NotSolvable;
     }
 
     if (min == sum) {
@@ -229,8 +224,8 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
             options.set(value);
             state.intersect(config, cell, options);
         }
-        return .unsolved;
-    } else if (min > sum) return .not_solvable;
+        return;
+    } else if (min > sum) return error.NotSolvable;
 
     if (max == sum) {
         iter = iterator;
@@ -241,8 +236,8 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
             options.set(value);
             state.intersect(config, cell, options);
         }
-        return .unsolved;
-    } else if (max < sum) return .not_solvable;
+        return;
+    } else if (max < sum) return error.NotSolvable;
 
     iter = iterator;
     while (iter.next()) |cell| {
@@ -271,7 +266,6 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
             state.intersect(config, cell, options);
         }
     }
-    return .unsolved;
 }
 
 const Cell = @import("../Cell.zig");

@@ -62,7 +62,7 @@ pub fn on_solution(self: *Setter_Context, config: *const Config, state: State, d
     }
 }
 
-pub fn on_backtrack(self: *Setter_Context, config: *const Config, state: State, depth: usize) !void {
+pub fn on_backtrack(self: *Setter_Context, config: *const Config, state: State, depth: usize, _: anyerror) !void {
     _ = config;
     _ = state;
     self.counters.backtracks += 1;

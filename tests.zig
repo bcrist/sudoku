@@ -176,7 +176,7 @@ test "standard sudoku details" {
 
     var state = config.initial_state;
 
-    try std.testing.expectEqual(.unsolved, config.constraints[0].evaluate(&config, &state));
+    try config.constraints[0].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -194,15 +194,15 @@ test "standard sudoku details" {
         , temp.items);
 
     // column constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[10].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[11].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[12].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[13].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[14].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[15].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[16].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[17].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[18].evaluate(&config, &state));
+    try config.constraints[10].evaluate(&config, &state);
+    try config.constraints[11].evaluate(&config, &state);
+    try config.constraints[12].evaluate(&config, &state);
+    try config.constraints[13].evaluate(&config, &state);
+    try config.constraints[14].evaluate(&config, &state);
+    try config.constraints[15].evaluate(&config, &state);
+    try config.constraints[16].evaluate(&config, &state);
+    try config.constraints[17].evaluate(&config, &state);
+    try config.constraints[18].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -220,15 +220,15 @@ test "standard sudoku details" {
         , temp.items);
 
     // row constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[2].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[3].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[4].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[5].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[6].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[7].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[8].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[9].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
+    try config.constraints[2].evaluate(&config, &state);
+    try config.constraints[3].evaluate(&config, &state);
+    try config.constraints[4].evaluate(&config, &state);
+    try config.constraints[5].evaluate(&config, &state);
+    try config.constraints[6].evaluate(&config, &state);
+    try config.constraints[7].evaluate(&config, &state);
+    try config.constraints[8].evaluate(&config, &state);
+    try config.constraints[9].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -246,15 +246,15 @@ test "standard sudoku details" {
         , temp.items);
 
     // box constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[19].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[20].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[21].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[22].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[23].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[24].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[25].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[26].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[27].evaluate(&config, &state));
+    try config.constraints[19].evaluate(&config, &state);
+    try config.constraints[20].evaluate(&config, &state);
+    try config.constraints[21].evaluate(&config, &state);
+    try config.constraints[22].evaluate(&config, &state);
+    try config.constraints[23].evaluate(&config, &state);
+    try config.constraints[24].evaluate(&config, &state);
+    try config.constraints[25].evaluate(&config, &state);
+    try config.constraints[26].evaluate(&config, &state);
+    try config.constraints[27].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -272,37 +272,37 @@ test "standard sudoku details" {
         , temp.items);
 
     // column constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[10].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[11].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[12].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[13].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[14].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[15].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[16].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[17].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[18].evaluate(&config, &state));
+    try config.constraints[10].evaluate(&config, &state);
+    try config.constraints[11].evaluate(&config, &state);
+    try config.constraints[12].evaluate(&config, &state);
+    try config.constraints[13].evaluate(&config, &state);
+    try config.constraints[14].evaluate(&config, &state);
+    try config.constraints[15].evaluate(&config, &state);
+    try config.constraints[16].evaluate(&config, &state);
+    try config.constraints[17].evaluate(&config, &state);
+    try config.constraints[18].evaluate(&config, &state);
 
     // row constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[2].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[3].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[4].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[5].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[6].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[7].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[8].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[9].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
+    try config.constraints[2].evaluate(&config, &state);
+    try config.constraints[3].evaluate(&config, &state);
+    try config.constraints[4].evaluate(&config, &state);
+    try config.constraints[5].evaluate(&config, &state);
+    try config.constraints[6].evaluate(&config, &state);
+    try config.constraints[7].evaluate(&config, &state);
+    try config.constraints[8].evaluate(&config, &state);
+    try config.constraints[9].evaluate(&config, &state);
 
     // box constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[19].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[20].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[21].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[22].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[23].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[24].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[25].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[26].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[27].evaluate(&config, &state));
+    try config.constraints[19].evaluate(&config, &state);
+    try config.constraints[20].evaluate(&config, &state);
+    try config.constraints[21].evaluate(&config, &state);
+    try config.constraints[22].evaluate(&config, &state);
+    try config.constraints[23].evaluate(&config, &state);
+    try config.constraints[24].evaluate(&config, &state);
+    try config.constraints[25].evaluate(&config, &state);
+    try config.constraints[26].evaluate(&config, &state);
+    try config.constraints[27].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -320,37 +320,37 @@ test "standard sudoku details" {
         , temp.items);
 
     // column constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[10].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[11].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[12].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[13].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[14].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[15].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[16].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[17].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[18].evaluate(&config, &state));
+    try config.constraints[10].evaluate(&config, &state);
+    try config.constraints[11].evaluate(&config, &state);
+    try config.constraints[12].evaluate(&config, &state);
+    try config.constraints[13].evaluate(&config, &state);
+    try config.constraints[14].evaluate(&config, &state);
+    try config.constraints[15].evaluate(&config, &state);
+    try config.constraints[16].evaluate(&config, &state);
+    try config.constraints[17].evaluate(&config, &state);
+    try config.constraints[18].evaluate(&config, &state);
 
     // row constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[2].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[3].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[4].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[5].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[6].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[7].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[8].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[9].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
+    try config.constraints[2].evaluate(&config, &state);
+    try config.constraints[3].evaluate(&config, &state);
+    try config.constraints[4].evaluate(&config, &state);
+    try config.constraints[5].evaluate(&config, &state);
+    try config.constraints[6].evaluate(&config, &state);
+    try config.constraints[7].evaluate(&config, &state);
+    try config.constraints[8].evaluate(&config, &state);
+    try config.constraints[9].evaluate(&config, &state);
 
     // box constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[19].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[20].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[21].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[22].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[23].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[24].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[25].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[26].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[27].evaluate(&config, &state));
+    try config.constraints[19].evaluate(&config, &state);
+    try config.constraints[20].evaluate(&config, &state);
+    try config.constraints[21].evaluate(&config, &state);
+    try config.constraints[22].evaluate(&config, &state);
+    try config.constraints[23].evaluate(&config, &state);
+    try config.constraints[24].evaluate(&config, &state);
+    try config.constraints[25].evaluate(&config, &state);
+    try config.constraints[26].evaluate(&config, &state);
+    try config.constraints[27].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -368,37 +368,37 @@ test "standard sudoku details" {
         , temp.items);
 
     // column constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[10].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[11].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[12].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[13].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[14].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[15].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[16].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[17].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[18].evaluate(&config, &state));
+    try config.constraints[10].evaluate(&config, &state);
+    try config.constraints[11].evaluate(&config, &state);
+    try config.constraints[12].evaluate(&config, &state);
+    try config.constraints[13].evaluate(&config, &state);
+    try config.constraints[14].evaluate(&config, &state);
+    try config.constraints[15].evaluate(&config, &state);
+    try config.constraints[16].evaluate(&config, &state);
+    try config.constraints[17].evaluate(&config, &state);
+    try config.constraints[18].evaluate(&config, &state);
 
     // row constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[2].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[3].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[4].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[5].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[6].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[7].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[8].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[9].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
+    try config.constraints[2].evaluate(&config, &state);
+    try config.constraints[3].evaluate(&config, &state);
+    try config.constraints[4].evaluate(&config, &state);
+    try config.constraints[5].evaluate(&config, &state);
+    try config.constraints[6].evaluate(&config, &state);
+    try config.constraints[7].evaluate(&config, &state);
+    try config.constraints[8].evaluate(&config, &state);
+    try config.constraints[9].evaluate(&config, &state);
 
     // box constraints
-    try std.testing.expectEqual(.unsolved, config.constraints[19].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[20].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[21].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[22].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[23].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[24].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[25].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[26].evaluate(&config, &state));
-    try std.testing.expectEqual(.unsolved, config.constraints[27].evaluate(&config, &state));
+    try config.constraints[19].evaluate(&config, &state);
+    try config.constraints[20].evaluate(&config, &state);
+    try config.constraints[21].evaluate(&config, &state);
+    try config.constraints[22].evaluate(&config, &state);
+    try config.constraints[23].evaluate(&config, &state);
+    try config.constraints[24].evaluate(&config, &state);
+    try config.constraints[25].evaluate(&config, &state);
+    try config.constraints[26].evaluate(&config, &state);
+    try config.constraints[27].evaluate(&config, &state);
 
     temp.clearRetainingCapacity();
     try state.debug_full(&config, &writer.new_interface);
@@ -601,7 +601,7 @@ test "Unique_Region constraint" {
     config.init_cell(.init(1, 1), 3);
     var state = config.initial_state;
 
-    try std.testing.expectEqual(.unsolved, config.constraints[0].evaluate(&config, &state));
+    try config.constraints[0].evaluate(&config, &state);
 
     try std.testing.expectEqual(0b001000, state.cells[0].mask);
     try std.testing.expectEqual(0b111110, state.cells[1].mask);
@@ -609,7 +609,7 @@ test "Unique_Region constraint" {
     try std.testing.expectEqual(0b111110, state.cells[3].mask);
     try std.testing.expectEqual(0b111110, state.cells[4].mask);
 
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
 
     try std.testing.expectEqual(0b001000, state.cells[0].mask);
     try std.testing.expectEqual(0b110110, state.cells[1].mask);
@@ -625,7 +625,7 @@ test "Unique_Region constraint" {
     try std.testing.expectEqual(0b110110, state.cells[3].mask);
     try std.testing.expectEqual(0b110110, state.cells[4].mask);
 
-    try std.testing.expectEqual(.unsolved, config.constraints[0].evaluate(&config, &state));
+    try config.constraints[0].evaluate(&config, &state);
 
     try std.testing.expectEqual(0b001000, state.cells[0].mask);
     try std.testing.expectEqual(0b110110, state.cells[1].mask);
@@ -633,7 +633,7 @@ test "Unique_Region constraint" {
     try std.testing.expectEqual(0b110110, state.cells[3].mask);
     try std.testing.expectEqual(0b110110, state.cells[4].mask);
 
-    try std.testing.expectEqual(.unsolved, config.constraints[1].evaluate(&config, &state));
+    try config.constraints[1].evaluate(&config, &state);
 
     try std.testing.expectEqual(0b001000, state.cells[0].mask);
     try std.testing.expectEqual(0b010110, state.cells[1].mask);

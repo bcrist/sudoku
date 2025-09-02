@@ -84,7 +84,7 @@ pub fn box_16x16(box: usize) Unique_Region {
     }})};
 }
 
-pub fn evaluate(self: Unique_Region, config: *const Config, state: *State) State.Solve_Status {
+pub fn evaluate(self: Unique_Region, config: *const Config, state: *State) error{NotSolvable}!void {
     var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
         const options = state.get(config, cell);
@@ -97,7 +97,6 @@ pub fn evaluate(self: Unique_Region, config: *const Config, state: *State) State
             }
         }
     }
-    return .unsolved;
 }
 
 const Unique_Region = @This();

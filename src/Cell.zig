@@ -20,6 +20,21 @@ pub fn expand_bounds(self: Cell, bounds: *Rect) void {
     }
 }
 
+pub fn offset(self: Cell, x: i32, y: i32) ?Cell {
+    const sx: i32 = self.x;
+    const sy: i32 = self.y;
+
+    const ox = sx + x;
+    const oy = sy + y;
+
+    if (ox < 0 or oy < 0) return null;
+
+    return .{
+        .x = @intCast(ox),
+        .y = @intCast(oy),
+    };
+}
+
 pub fn options(debug: []const u8) Value_Options {
     var o: Value_Options = .initEmpty();
     for (debug) |ch| switch (ch) {

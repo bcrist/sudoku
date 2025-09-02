@@ -12,8 +12,8 @@ pub const Constraint = union (enum) {
     //ascending_cells: Ascending_Cells,
     //consecutive_region: Consecutive_Region,
     //ratio_cells: Ratio_Cells,
-    //anti_knight_region: Anti_Knight_Region,
-    //anti_king_region: Anti_King_Region,
+    anti_chess_region: Anti_Chess_Region,
+    ranked_regions: Ranked_Regions,
     white_kropki: kropki.White,
     black_kropki: kropki.Black,
     xv_x: xv.X,
@@ -30,8 +30,8 @@ pub const Constraint = union (enum) {
     pub const Ascending_Cells = @import("constraint/Ascending_Cells.zig");
     pub const Consecutive_Region = @import("constraint/Consecutive_Region.zig");
     pub const Ratio_Cells = @import("constraint/Ratio_Cells.zig");
-    pub const Anti_Knight_Region = @import("constraint/Anti_Knight_Region.zig");
-    pub const Anti_King_Region = @import("constraint/Anti_King_Region.zig");
+    pub const Anti_Chess_Region = @import("constraint/Anti_Chess_Region.zig");
+    pub const Ranked_Regions = @import("constraint/Ranked_Regions.zig");
     pub const kropki = @import("constraint/kropki.zig");
     pub const xv = @import("constraint/xv.zig");
     pub const misc = @import("constraint/misc.zig");
@@ -70,14 +70,12 @@ pub const Constraint = union (enum) {
         }
     }
 
-    pub fn evaluate(self: Constraint, config: *const Config, state: *State) Solve_Status {
+    pub fn evaluate(self: Constraint, config: *const Config, state: *State) error{NotSolvable}!void {
         return switch (self) {
-            inline else => |c| c.evaluate(config, state),
+            inline else => |c| try c.evaluate(config, state),
         };
     }
 };
-
-const Solve_Status = State.Solve_Status;
 
 const State = @import("State.zig");
 const Config = @import("Config.zig");
