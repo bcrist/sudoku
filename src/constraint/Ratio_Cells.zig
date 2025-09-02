@@ -5,16 +5,12 @@ a: Cell,
 b: Cell,
 ratio: u8,
 
-pub fn init(ratio: u8, a: Cell, b: Cell) Ratio_Cells {
+pub fn init(ratio: u8, cell: Cell, direction: Cell.Direction) Ratio_Cells {
     return .{
-        .a = a,
-        .b = b,
+        .a = cell,
+        .b = cell.neighbor(direction).?,
         .ratio = ratio,
     };
-}
-
-pub fn init_kropki(a: Cell, b: Cell) Ratio_Cells {
-    return .init(2, a, b);
 }
 
 pub fn num_regions(_: Ratio_Cells) usize {
@@ -30,11 +26,23 @@ pub fn get_region(self: Ratio_Cells, region: usize) Region {
 }
 
 pub fn evaluate(self: Ratio_Cells, config: *const Config, state: *State) error{NotSolvable}!void {
-    _ = self;
-    _ = config;
-    _ = state;
-    // TODO
-    return error.NotSolvable;
+    const a_options = state.get(config, self.a);
+    const b_options = state.get(config, self.b);
+    state.intersect(config, self.a, self.get_new_options(b_options));
+    state.intersect(config, self.b, self.get_new_options(a_options));
+}
+
+fn get_new_options(self: Ratio_Cells, other: Cell.Value_Options) Cell.Value_Options {
+    var result: Cell.Value_Options = .initEmpty();
+    var iter = other.iterator(.{});
+    while (iter.next()) |value| {
+        const higher = value * self.ratio;
+        if (higher < 64) result.set(higher);
+
+        const lower = value / self.ratio;
+        if (lower * self.ratio == value) result.set(lower);
+    }
+    return result;
 }
 
 const Ratio_Cells = @This();

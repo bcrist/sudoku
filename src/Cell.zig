@@ -35,6 +35,19 @@ pub fn offset(self: Cell, x: i32, y: i32) ?Cell {
     };
 }
 
+pub fn neighbor(self: Cell, direction: Direction) ?Cell {
+    return switch (direction) {
+        .north     => self.offset( 0, -1),
+        .northeast => self.offset( 1, -1),
+        .east      => self.offset( 1,  0),
+        .southeast => self.offset( 1,  1),
+        .south     => self.offset( 0,  1),
+        .southwest => self.offset(-1,  1),
+        .west      => self.offset(-1,  0),
+        .northwest => self.offset(-1, -1),
+    };
+}
+
 pub fn options(debug: []const u8) Value_Options {
     var o: Value_Options = .initEmpty();
     for (debug) |ch| switch (ch) {
@@ -74,6 +87,17 @@ pub const Value_Options = std.bit_set.IntegerBitSet(64);
 pub const Iteration_Direction = enum {
     forward, // left-to-right, top-to-bottom
     reverse, // right-to-left, bottom-to-top
+};
+
+pub const Direction = enum {
+    north,
+    northeast,
+    east,
+    southeast,
+    south,
+    southwest,
+    west,
+    northwest,
 };
 
 pub const Index = enum (u32) {

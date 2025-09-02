@@ -8,10 +8,10 @@ pub const Constraint = union (enum) {
     sum_between_sentinels: Sum_Between_Sentinels,
     //equal_sum_regions: Equal_Sum_Regions,
     //equal_cells: Equal_Cells,
-    //ascending_sum_regions: Ascending_Sum_Regions,
+    //ascending_sum_line: Ascending_Sum_Line,
     //ascending_cells: Ascending_Cells,
-    //consecutive_region: Consecutive_Region,
-    //ratio_cells: Ratio_Cells,
+    consecutive_cells: Consecutive_Cells,
+    ratio_cells: Ratio_Cells,
     anti_chess_region: Anti_Chess_Region,
     ranked_regions: Ranked_Regions,
     white_kropki: kropki.White,
@@ -26,9 +26,8 @@ pub const Constraint = union (enum) {
     pub const Sum_Between_Sentinels = @import("constraint/Sum_Between_Sentinels.zig");
     pub const Equal_Sum_Regions = @import("constraint/Equal_Sum_Regions.zig");
     pub const Equal_Cells = @import("constraint/Equal_Cells.zig");
-    pub const Ascending_Sum_Regions = @import("constraint/Ascending_Sum_Regions.zig");
-    pub const Ascending_Cells = @import("constraint/Ascending_Cells.zig");
-    pub const Consecutive_Region = @import("constraint/Consecutive_Region.zig");
+    pub const Ascending_Line = @import("constraint/Ascending_Line.zig");
+    pub const Consecutive_Cells = @import("constraint/Consecutive_Cells.zig");
     pub const Ratio_Cells = @import("constraint/Ratio_Cells.zig");
     pub const Anti_Chess_Region = @import("constraint/Anti_Chess_Region.zig");
     pub const Ranked_Regions = @import("constraint/Ranked_Regions.zig");
@@ -36,6 +35,7 @@ pub const Constraint = union (enum) {
     pub const xv = @import("constraint/xv.zig");
     pub const misc = @import("constraint/misc.zig");
     // TODO German/Dutch/Chinese Whispers
+    // TODO Renban lines
     // TODO Modular regions
     // TODO palindrome lines
     // TODO between lines

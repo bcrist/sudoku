@@ -39,23 +39,32 @@ pub fn add_cell(self: *Builder, cell: Cell) !void {
     try self.add_rect(.from_cell(cell));
 }
 
-pub fn add_line(self: *Builder, direction: Direction, length: usize) !void {
+pub fn add_line(self: *Builder, direction: Cell.Direction, length: usize) !void {
     std.debug.assert(self.region_rects.items.len > 0);
     try self.region_rects.ensureUnusedCapacity(self.gpa, length);
     for (0..length) |_| {
         const prev_rect = self.region_rects.getLast();
         std.debug.assert(prev_rect.width() == 1 and prev_rect.height() == 1);
         const prev = prev_rect.min;
-        try self.add_cell(switch (direction) {
-            .north      => .init(prev.x,     prev.y - 1),
-            .northeast  => .init(prev.x + 1, prev.y - 1),
-            .east       => .init(prev.x + 1, prev.y),
-            .southeast  => .init(prev.x + 1, prev.y + 1),
-            .south      => .init(prev.x,     prev.y + 1),
-            .southwest  => .init(prev.x - 1, prev.y + 1),
-            .west       => .init(prev.x - 1, prev.y),
-            .northwest  => .init(prev.x - 1, prev.y - 1),
-        });
+        try self.add_cell(prev.neighbor(direction) orelse return);
+    }
+}
+
+pub fn add_line_within_region(self: *Builder, direction: Cell.Direction, region: Region) !void {
+    std.debug.assert(self.region_rects.items.len > 0);
+    const prev_rect = self.region_rects.getLast();
+    std.debug.assert(prev_rect.width() == 1 and prev_rect.height() == 1);
+
+    var bounds: Rect = .empty;
+    region.expand_bounds(&bounds);
+
+    var cell = prev_rect.min;
+    while (true) {
+        cell = cell.neighbor(direction) orelse return;
+        if (!bounds.contains(cell)) return;
+        if (region.contains(cell)) {
+            try self.add_cell(cell);
+        }
     }
 }
 
@@ -69,6 +78,27 @@ pub fn build_region(self: *Builder) !Region {
     const rects = try self.arena.dupe(Rect, self.region_rects.items);
     self.region_rects.clearRetainingCapacity();
     return .multi(rects);
+}
+
+pub fn region_diagonal_ascending(self: *Builder, dim: usize) !Region {
+    self.assert_empty_region();
+    try self.add_cell(.init(1, dim));
+    try self.add_line(.northeast, dim - 1);
+    return try self.build_region();
+}
+
+pub fn region_diagonal_descending(self: *Builder, dim: usize) !Region {
+    self.assert_empty_region();
+    try self.add_cell(.init(1, 1));
+    try self.add_line(.southeast, dim - 1);
+    return try self.build_region();
+}
+
+pub fn region_along_line(self: *Builder, board: Region, starting_cell: Cell, direction: Cell.Direction) !Region {
+    self.assert_empty_region();
+    try self.add_cell(starting_cell);
+    try self.add_line_within_region(direction, board);
+    return try self.build_region();
 }
 
 pub fn build(self: *Builder) !Config {
@@ -134,24 +164,10 @@ pub fn add_16x16(self: *Builder) !void {
     try self.add_boxes_16x16();
 }
 
-pub fn add_diagonals(self: *Builder, dim: usize) !void {
+pub fn add_unique_diagonals(self: *Builder, dim: usize) !void {
     try self.constraints.ensureUnusedCapacity(self.gpa, 2);
     self.constraints.appendAssumeCapacity(.{ .unique_region = .{ .region = try self.region_diagonal_ascending(dim) } });
     self.constraints.appendAssumeCapacity(.{ .unique_region = .{ .region = try self.region_diagonal_descending(dim) } });
-}
-
-pub fn region_diagonal_ascending(self: *Builder, dim: usize) !Region {
-    self.assert_empty_region();
-    try self.add_cell(.init(1, dim));
-    try self.add_line(.northeast, dim - 1);
-    return try self.build_region();
-}
-
-pub fn region_diagonal_descending(self: *Builder, dim: usize) !Region {
-    self.assert_empty_region();
-    try self.add_cell(.init(1, 1));
-    try self.add_line(.southeast, dim - 1);
-    return try self.build_region();
 }
 
 pub fn add_square_rows(self: *Builder, dim: usize) !void {
@@ -244,17 +260,32 @@ pub fn add_disjoint_sets_9x9(self: *Builder) !void {
     }
 }
 
+pub fn add_thermo(self: *Builder, bulb: Cell, path: []const Cell.Direction) !void {
+    self.assert_empty_region();
+    try self.region_rects.ensureUnusedCapacity(self.gpa, path.len + 1);
+    try self.add_cell(bulb);
+    for (path) |dir| {
+        try self.add_line(dir, 1);
+    }
+    try self.add(.{ .ascending_line = .init(try self.build_region(), .{}) });
+}
 
-pub const Direction = enum {
-    north,
-    northeast,
-    east,
-    southeast,
-    south,
-    southwest,
-    west,
-    northwest,
-};
+pub fn add_arrow(self: *Builder, bulb: Cell, path: []const Cell.Direction) !void {
+    var regions = self.arena.alloc(Region, 2);
+    errdefer self.arena.free(regions);
+
+    regions[0] = .single(.{ .offset = bulb });
+
+    self.assert_empty_region();
+    try self.region_rects.ensureUnusedCapacity(self.gpa, path.len + 1);
+    try self.add_cell(bulb.neighbor(path[0]));
+    for (path[1..]) |dir| {
+        try self.add_line(dir, 1);
+    }
+    regions[1] = try self.build_region();
+
+    try self.add(.{ .equal_sum_regions = .{ .regions = regions } });
+}
 
 const Builder = @This();
 

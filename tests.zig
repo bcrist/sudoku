@@ -147,6 +147,62 @@ test "https://www.youtube.com/watch?v=Nbp5FRyACmA" {
     );
 }
 
+test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
+    // This test runs pretty slowly (expected since the intended solve path involves coloring the whole board)
+    // It only takes a few seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
+    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+
+    var b: sudoku.Constraint.Builder = .init(std.testing.allocator, arena.allocator());
+    defer b.deinit();
+
+    const board: sudoku.Rect = .init(.{ .dim = 9 });
+    const board_region: sudoku.Region = .single(.{ .rect = board });
+
+    try b.add_9x9();
+
+    // black kropki
+    try b.add(.{ .ratio_cells = .init(2, .init(5, 4), .south) });
+    try b.add(.{ .ratio_cells = .init(2, .init(6, 6), .south) });
+    try b.add(.{ .ratio_cells = .init(2, .init(7, 3), .south) });
+
+    // white kropki
+    try b.add(.{ .consecutive_cells = .init(.init(6, 3), .south, .{}) });
+    try b.add(.{ .consecutive_cells = .init(.init(6, 3), .east, .{}) });
+    try b.add(.{ .consecutive_cells = .init(.init(6, 4), .east, .{}) });
+    try b.add(.{ .consecutive_cells = .init(.init(5, 6), .south, .{}) });
+    try b.add(.{ .consecutive_cells = .init(.init(5, 6), .east, .{}) });
+    try b.add(.{ .consecutive_cells = .init(.init(5, 7), .east, .{}) });
+
+    // diagonal sums
+    try b.add(.{ .sum_region = .init(33, try b.region_along_line(board_region, .init(9, 3), .southwest)) });
+    try b.add(.{ .sum_region = .init(33, try b.region_along_line(board_region, .init(6, 9), .northwest)) });
+
+    try b.add(.{ .anti_chess_region = .init(.single(.{ .rect = board }), .{
+        .anti_knight = true,
+        .anti_king = true,
+    }) });
+
+    var config = try b.build();
+    
+    const result = try config.solve(std.testing.allocator, .default);
+    defer result.solution.?.deinit(std.testing.allocator);
+    try check_solution(&config, result,
+        \\795681432
+        \\681432795
+        \\432795681
+        \\956814327
+        \\814327956
+        \\327956814
+        \\568143279
+        \\143279568
+        \\279568143
+        \\
+    );
+}
+
 test "standard sudoku details" {
     var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
     defer arena.deinit();
