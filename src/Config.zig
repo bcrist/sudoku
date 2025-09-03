@@ -56,7 +56,7 @@ pub fn init(allocator: std.mem.Allocator, constraints: []const Constraint) !Conf
                 while (iter.next()) |cell| {
                     const index = cell_map[self.cell_map_index(cell)].raw();
                     cell_strength[index].cell = cell;
-                    cell_strength[index].strength += 1;
+                    cell_strength[index].strength += 1; // TODO allow constraints to customize the weight they add to each cell
                 }
             }
         }

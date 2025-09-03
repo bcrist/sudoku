@@ -46,7 +46,7 @@ pub fn add_line(self: *Builder, direction: Cell.Direction, length: usize) !void 
         const prev_rect = self.region_rects.getLast();
         std.debug.assert(prev_rect.width() == 1 and prev_rect.height() == 1);
         const prev = prev_rect.min;
-        try self.add_cell(prev.neighbor(direction) orelse return);
+        try self.add_cell(prev.neighbor(direction) orelse unreachable);
     }
 }
 
@@ -267,18 +267,18 @@ pub fn add_thermo(self: *Builder, bulb: Cell, path: []const Cell.Direction) !voi
     for (path) |dir| {
         try self.add_line(dir, 1);
     }
-    try self.add(.{ .ascending_line = .init(try self.build_region(), .{}) });
+    try self.add(.{ .ascending_cells = .{ .region = try self.build_region() } });
 }
 
 pub fn add_arrow(self: *Builder, bulb: Cell, path: []const Cell.Direction) !void {
-    var regions = self.arena.alloc(Region, 2);
+    var regions = try self.arena.alloc(Region, 2);
     errdefer self.arena.free(regions);
 
     regions[0] = .single(.{ .offset = bulb });
 
     self.assert_empty_region();
     try self.region_rects.ensureUnusedCapacity(self.gpa, path.len + 1);
-    try self.add_cell(bulb.neighbor(path[0]));
+    try self.add_cell(bulb.neighbor(path[0]) orelse unreachable);
     for (path[1..]) |dir| {
         try self.add_line(dir, 1);
     }

@@ -6,10 +6,9 @@ pub const Constraint = union (enum) {
     unique_region: Unique_Region,
     sum_region: Sum_Region,
     sum_between_sentinels: Sum_Between_Sentinels,
-    //equal_sum_regions: Equal_Sum_Regions,
-    //equal_cells: Equal_Cells,
-    //ascending_sum_line: Ascending_Sum_Line,
-    //ascending_cells: Ascending_Cells,
+    equal_sum_regions: Equal_Sum_Regions,
+    equal_cells: Equal_Cells,
+    ascending_cells: Ascending_Cells,
     consecutive_cells: Consecutive_Cells,
     ratio_cells: Ratio_Cells,
     anti_chess_region: Anti_Chess_Region,
@@ -26,7 +25,7 @@ pub const Constraint = union (enum) {
     pub const Sum_Between_Sentinels = @import("constraint/Sum_Between_Sentinels.zig");
     pub const Equal_Sum_Regions = @import("constraint/Equal_Sum_Regions.zig");
     pub const Equal_Cells = @import("constraint/Equal_Cells.zig");
-    pub const Ascending_Line = @import("constraint/Ascending_Line.zig");
+    pub const Ascending_Cells = @import("constraint/Ascending_Cells.zig");
     pub const Consecutive_Cells = @import("constraint/Consecutive_Cells.zig");
     pub const Ratio_Cells = @import("constraint/Ratio_Cells.zig");
     pub const Anti_Chess_Region = @import("constraint/Anti_Chess_Region.zig");

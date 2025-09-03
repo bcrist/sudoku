@@ -88,16 +88,17 @@ pub fn set_union(self: *State, config: *const Config, cell: Cell, options: Cell.
     }
 }
 
-pub fn intersect(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) void {
+pub fn intersect(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) Cell.Value_Options {
     const index = config.cell_index(cell);
-    const raw = index.maybe_raw() orelse return;
-    if (raw >= self.cells.len) return;
+    const raw = index.maybe_raw() orelse return .initEmpty();
+    if (raw >= self.cells.len) return .initEmpty();
     const old = self.cells[raw];
     const new = old.intersectWith(options);
     if (!new.eql(old)) {
         self.cells[raw] = new;
         self.modified = true;
     }
+    return new;
 }
 
 pub fn debug(self: State, config: *const Config, writer: *std.io.Writer) !void {
@@ -189,6 +190,10 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
                 return;
             };
         }
+
+        // TODO consider passing an "effort" enum to evaluate():
+        // 1. iterate repeatedly with low effort until no modifications are made.
+        // 2. iterate once with high effort - if modifications are made then go back to 1., else bifurcate
 
         try ctx.on_evaluation(config, self.*);
     }

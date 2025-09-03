@@ -32,8 +32,8 @@ pub fn get_region(self: Consecutive_Cells, region: usize) Region {
 pub fn evaluate(self: Consecutive_Cells, config: *const Config, state: *State) error{NotSolvable}!void {
     const a_options = state.get(config, self.a);
     const b_options = state.get(config, self.b);
-    state.intersect(config, self.a, self.get_new_options(b_options));
-    state.intersect(config, self.b, self.get_new_options(a_options));
+    _ = state.intersect(config, self.a, self.get_new_options(b_options));
+    _ = state.intersect(config, self.b, self.get_new_options(a_options));
 }
 
 fn get_new_options(self: Consecutive_Cells, other: Cell.Value_Options) Cell.Value_Options {

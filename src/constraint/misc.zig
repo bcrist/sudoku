@@ -108,7 +108,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
             }
         }
 
-        state.intersect(config, cell, options);
+        _ = state.intersect(config, cell, options);
     }
 });
 

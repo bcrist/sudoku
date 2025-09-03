@@ -28,7 +28,7 @@ During the first step, if any constraints have been violated, the puzzle is unso
 
 During the second step the algorithm asks "What happens if I set one cell to a particular digit?"  If the puzzle eventually becomes unsolvable with that digit, it tries again with a different digit until there are no options remaining.  Effectively this acts as a depth-first search, but since the constraints are re-evaluated every time a new cell is selected, the search space converges faster than you might expect (as long as the puzzle has enough constraints to guarantee a single unique solution).  In manual solving, this strategy is known as bifurcation or "guess and check" and is often frowned-upon, and there exist more efficient algorithms, but bifurcation provides maximum flexibility of constraints, is guaranteed to work for any puzzle, and makes it possible to find every unique solution, if more than one exists.  There are, however, a few things it's not good at:
 
-1. Puzzles where the intended strategy involves coloring often run slowly (i.e. symbolically solving the entire puzzle, then disambiguating the mapping of colors/symbols to digits at the end)
+1. Some puzzles solve very slowly.  e.g. Puzzles where the intended strategy involves "coloring", i.e. symbolically solving the entire puzzle, then at the end disambiguating the mapping of colors/symbols to digits.
 2. Discovering what partial deductions can be made about a severely under-constrained puzzle.
 3. Explaining the logical deductions required to solve the puzzle.
 

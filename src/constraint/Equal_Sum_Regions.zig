@@ -5,13 +5,31 @@
 regions: []const Region,
         
 pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSolvable}!void {
-    _ = self;
-    _ = config;
-    _ = state;
-    // TODO
-    return .not_solvable;
+    var min_sum: usize = 0;
+    var max_sum: usize = std.math.maxInt(usize);
+
+    for (self.regions) |region| {
+        var min: u64 = 0;
+        var max: u64 = 0;
+
+        var iter = region.iterator(.forward);
+        while (iter.next()) |cell| {
+            const options = state.get(config, cell);
+            min += options.findFirstSet() orelse 0;
+            max += options.findLastSet() orelse 0;
+        }
+
+        min_sum = @max(min_sum, min);
+        max_sum = @min(max_sum, max);
+    }
+
+    for (self.regions) |region| {
+        try base.evaluate_sum_cells(config, state, region.iterator(.forward), min_sum, max_sum);
+    }
 }
 
 const Region = @import("../region.zig").Region;
 const Config = @import("../Config.zig");
 const State = @import("../State.zig");
+const base = @import("base.zig");
+const std = @import("std");

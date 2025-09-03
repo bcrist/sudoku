@@ -92,7 +92,7 @@ pub fn evaluate(self: Unique_Region, config: *const Config, state: *State) error
             var iter2 = self.region.iterator(.forward);
             while (iter2.next()) |cell2| {
                 if (!std.meta.eql(cell, cell2)) {
-                    state.intersect(config, cell2, options.complement());
+                    _ = state.intersect(config, cell2, options.complement());
                 }
             }
         }

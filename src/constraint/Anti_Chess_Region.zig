@@ -92,7 +92,7 @@ fn evaluate_adjacency(self: Anti_Chess_Region, config: *const Config, state: *St
 
     var new_options: Cell.Value_Options = .initFull();
     new_options.unset(anti_value);
-    state.intersect(config, cell, new_options);
+    _ = state.intersect(config, cell, new_options);
 }
 
 const Anti_Chess_Region = @This();

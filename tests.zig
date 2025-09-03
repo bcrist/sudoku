@@ -176,7 +176,7 @@ test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
     try b.add(.{ .consecutive_cells = .init(.init(5, 6), .east, .{}) });
     try b.add(.{ .consecutive_cells = .init(.init(5, 7), .east, .{}) });
 
-    // diagonal sums
+    // diagonal sums (little killer)
     try b.add(.{ .sum_region = .init(33, try b.region_along_line(board_region, .init(9, 3), .southwest)) });
     try b.add(.{ .sum_region = .init(33, try b.region_along_line(board_region, .init(6, 9), .northwest)) });
 
@@ -199,6 +199,147 @@ test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
         \\568143279
         \\143279568
         \\279568143
+        \\
+    );
+}
+
+test "https://www.youtube.com/watch?v=9dXrnS0KVAw" {
+    // This test runs pretty slowly
+    // It only takes around 5 seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
+    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+
+    var b: sudoku.Constraint.Builder = .init(std.testing.allocator, arena.allocator());
+    defer b.deinit();
+
+    const board: sudoku.Rect = .init(.{ .dim = 9 });
+    const board_region: sudoku.Region = .single(.{ .rect = board });
+
+    try b.add_9x9();
+    try b.add_unique_diagonals(9);
+
+    // diagonal sums (little killer)
+    try b.add(.{ .sum_region = .init(19, try b.region_along_line(board_region, .init(3, 1), .southwest)) });
+    try b.add(.{ .sum_region = .init(28, try b.region_along_line(board_region, .init(4, 1), .southwest)) });
+    try b.add(.{ .sum_region = .init(17, try b.region_along_line(board_region, .init(5, 1), .southwest)) });
+
+    try b.add(.{ .sum_region = .init(21, try b.region_along_line(board_region, .init(9, 4), .northwest)) });
+    try b.add(.{ .sum_region = .init(14, try b.region_along_line(board_region, .init(9, 8), .northwest)) });
+
+    try b.add(.{ .sum_region = .init(12, try b.region_along_line(board_region, .init(6, 9), .northeast)) });
+    try b.add(.{ .sum_region = .init(11, try b.region_along_line(board_region, .init(7, 9), .northeast)) });
+
+    try b.add(.{ .sum_region = .init( 9, try b.region_along_line(board_region, .init(1, 7), .southeast)) });
+    try b.add(.{ .sum_region = .init(13, try b.region_along_line(board_region, .init(1, 8), .southeast)) });
+    try b.add(.{ .sum_region = .init(66, try b.region_along_line(board_region, .init(1, 2), .southeast)) });
+
+    var config = try b.build();
+    
+    const result = try config.solve(std.testing.allocator, .default);
+    defer result.solution.?.deinit(std.testing.allocator);
+    try check_solution(&config, result,
+        \\135928467
+        \\782564391
+        \\694173258
+        \\829316745
+        \\471852936
+        \\563497182
+        \\258739614
+        \\917645823
+        \\346281579
+        \\
+    );
+}
+
+test "https://www.youtube.com/watch?v=NddLgz4loUE" {
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+
+    var b: sudoku.Constraint.Builder = .init(std.testing.allocator, arena.allocator());
+    defer b.deinit();
+
+    const board: sudoku.Rect = .init(.{ .dim = 9 });
+    const board_region: sudoku.Region = .single(.{ .rect = board });
+
+    try b.add_9x9();
+
+    // diagonal sums (little killer)
+    try b.add(.{ .sum_region = .init(10, try b.region_along_line(board_region, .init(3, 1), .southwest)) });
+    try b.add(.{ .sum_region = .init(12, try b.region_along_line(board_region, .init(4, 1), .southwest)) });
+    try b.add(.{ .sum_region = .init( 9, try b.region_along_line(board_region, .init(9, 3), .northwest)) });
+    try b.add(.{ .sum_region = .init(14, try b.region_along_line(board_region, .init(9, 4), .northwest)) });
+    try b.add(.{ .sum_region = .init(14, try b.region_along_line(board_region, .init(1, 7), .southeast)) });
+
+    // thermos
+    try b.add_thermo(.init(4, 4), &.{ .south, .south, .east, .east });
+    try b.add_thermo(.init(3, 2), &.{ .west, .west, .south });
+    try b.add_thermo(.init(3, 8), &.{ .west, .west, .north });
+    try b.add_thermo(.init(9, 4), &.{ .north, .north, .west });
+    try b.add_thermo(.init(9, 7), &.{ .west, .north });
+    try b.add_thermo(.init(5, 8), &.{ .north, .west });
+    try b.add_thermo(.init(9, 8), &.{ .south });
+
+    var config = try b.build();
+    
+    const result = try config.solve(std.testing.allocator, .default);
+    defer result.solution.?.deinit(std.testing.allocator);
+    try check_solution(&config, result,
+        \\963254178
+        \\421987563
+        \\578163942
+        \\247396851
+        \\895421736
+        \\136578294
+        \\719632485
+        \\654819327
+        \\382745619
+        \\
+    );
+}
+
+test "https://www.youtube.com/watch?v=AvEL10Hx8JY" {
+    // This test runs pretty slowly
+    // It only takes around 5 seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
+    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+
+    var b: sudoku.Constraint.Builder = .init(std.testing.allocator, arena.allocator());
+    defer b.deinit();
+
+    try b.add_9x9();
+
+    // arrows
+    try b.add_arrow(.init(9, 9), &.{ .north, .north, .north, .west });
+    try b.add_arrow(.init(3, 7), &.{ .north, .northwest, .northwest });
+    try b.add_arrow(.init(3, 7), &.{ .northeast, .northeast, .northeast });
+    try b.add_arrow(.init(1, 1), &.{ .south, .south, .east });
+    try b.add_arrow(.init(3, 3), &.{ .north, .west });
+    try b.add_arrow(.init(4, 3), &.{ .north, .east });
+    try b.add_arrow(.init(6, 1), &.{ .south, .south, .west });
+    try b.add_arrow(.init(7, 2), &.{ .north, .east, .east });
+    try b.add_arrow(.init(9, 2), &.{ .south, .west });
+    try b.add_arrow(.init(5, 4), &.{ .southwest, .west });
+    try b.add_arrow(.init(1, 6), &.{ .south, .east });
+    try b.add_arrow(.init(1, 9), &.{ .north, .east, .east });
+
+    var config = try b.build();
+    
+    const result = try config.solve(std.testing.allocator, .default);
+    defer result.solution.?.deinit(std.testing.allocator);
+    try check_solution(&config, result,
+        \\865749123
+        \\427531689
+        \\319826745
+        \\183964257
+        \\754218396
+        \\692375814
+        \\248693571
+        \\531487962
+        \\976152438
         \\
     );
 }
@@ -696,6 +837,24 @@ test "Unique_Region constraint" {
     try std.testing.expectEqual(0b100000, state.cells[2].mask);
     try std.testing.expectEqual(0b010110, state.cells[3].mask);
     try std.testing.expectEqual(0b010110, state.cells[4].mask);
+}
+
+test "Ascending_Cells.get_ascending_options" {
+    const get_options = sudoku.Constraint.Ascending_Cells.get_ascending_options;
+    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.initEmpty()).mask);
+    try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111110, get_options(.{ .mask = 1 }).mask);
+    try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111000, get_options(.{ .mask = 0b100 }).mask);
+    try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111000, get_options(.{ .mask = 0b100001110111000000111100 }).mask);
+    try std.testing.expectEqual(0, get_options(.{ .mask = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 }).mask);
+}
+
+test "Ascending_Cells.get_descending_options" {
+    const get_options = sudoku.Constraint.Ascending_Cells.get_descending_options;
+    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.initEmpty()).mask);
+    try std.testing.expectEqual(0, get_options(.{ .mask = 1 }).mask);
+    try std.testing.expectEqual(0b11, get_options(.{ .mask = 0b100 }).mask);
+    try std.testing.expectEqual(0b11111111111111111111111, get_options(.{ .mask = 0b100001110111000000111100 }).mask);
+    try std.testing.expectEqual(0b01111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111, get_options(.{ .mask = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000 }).mask);
 }
 
 const sudoku = @import("sudoku");

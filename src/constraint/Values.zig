@@ -74,7 +74,7 @@ pub fn evaluate(self: Values, config: *const Config, state: *State) error{NotSol
     const values = self.values;
     var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
-        state.intersect(config, cell, values);
+        _ = state.intersect(config, cell, values);
     }
 }
 
