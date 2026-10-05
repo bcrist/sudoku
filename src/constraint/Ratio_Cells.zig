@@ -22,7 +22,7 @@ pub fn get_region(self: Ratio_Cells, region: usize) Region {
         0 => self.a,
         1 => self.b,
         else => unreachable,
-    }});
+    } });
 }
 
 pub fn evaluate(self: Ratio_Cells, config: *const Config, state: *State) error{NotSolvable}!void {
@@ -33,7 +33,7 @@ pub fn evaluate(self: Ratio_Cells, config: *const Config, state: *State) error{N
 }
 
 fn get_new_options(self: Ratio_Cells, other: Cell.Value_Options) Cell.Value_Options {
-    var result: Cell.Value_Options = .initEmpty();
+    var result: Cell.Value_Options = .empty;
     var iter = other.iterator(.{});
     while (iter.next()) |value| {
         const higher = value * self.ratio;

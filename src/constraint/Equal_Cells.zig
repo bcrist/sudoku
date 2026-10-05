@@ -2,9 +2,9 @@
 //! Note all Equal_Cell constraints could be expressed as Equal_Sum_Regions constraints, but this provides easier configuration for a subset of use cases.
 
 region: Region,
-        
+
 pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSolvable}!void {
-    var options: Cell.Value_Options = .initFull();
+    var options: Cell.Value_Options = .empty;
     var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
         options.setIntersection(state.get(config, cell));

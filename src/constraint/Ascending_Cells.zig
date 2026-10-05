@@ -3,15 +3,15 @@
 //! Note only single cell Rects should be used in the region to ensure expected iteration order.
 
 region: Region,
-        
+
 pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSolvable}!void {
-    var prev: Cell.Value_Options = .initFull();
+    var prev: Cell.Value_Options = .full;
     var iter = self.region.iterator(.forward);
     while (iter.next()) |cell| {
         prev = state.intersect(config, cell, get_ascending_options(prev));
     }
 
-    prev = .initFull();
+    prev = .full;
     iter = self.region.iterator(.reverse);
     while (iter.next()) |cell| {
         prev = state.intersect(config, cell, get_descending_options(prev));
@@ -19,16 +19,16 @@ pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSo
 }
 
 pub fn get_ascending_options(prev: Cell.Value_Options) Cell.Value_Options {
-    const prev_lsb = prev.findFirstSet() orelse return .initFull();
-    var bad_options: Cell.Value_Options = .initEmpty();
+    const prev_lsb = prev.findFirstSet() orelse return .full;
+    var bad_options: Cell.Value_Options = .empty;
     bad_options.set(prev_lsb);
     bad_options.mask |= bad_options.mask - 1;
     return bad_options.complement();
 }
 
 pub fn get_descending_options(prev: Cell.Value_Options) Cell.Value_Options {
-    const prev_msb = prev.findLastSet() orelse return .initFull();
-    var new_options: Cell.Value_Options = .initEmpty();
+    const prev_msb = prev.findLastSet() orelse return .full;
+    var new_options: Cell.Value_Options = .empty;
     new_options.set(prev_msb);
     new_options.mask -= 1;
     return new_options;

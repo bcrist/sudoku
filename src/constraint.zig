@@ -1,5 +1,4 @@
-
-pub const Constraint = union (enum) {
+pub const Constraint = union(enum) {
     pub const Builder = @import("constraint/Builder.zig");
 
     values: Values,

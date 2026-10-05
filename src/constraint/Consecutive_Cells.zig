@@ -26,7 +26,7 @@ pub fn get_region(self: Consecutive_Cells, region: usize) Region {
         0 => self.a,
         1 => self.b,
         else => unreachable,
-    }});
+    } });
 }
 
 pub fn evaluate(self: Consecutive_Cells, config: *const Config, state: *State) error{NotSolvable}!void {

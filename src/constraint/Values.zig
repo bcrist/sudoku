@@ -17,7 +17,7 @@ pub fn init_square(dim: usize) Values {
 }
 
 pub fn init_range(min: usize, max: usize, region: Region) Values {
-    var v: Cell.Value_Options = .initEmpty();
+    var v: Cell.Value_Options = .empty;
     v.setRangeValue(.{
         .start = min,
         .end = max + 1,

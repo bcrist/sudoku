@@ -3,7 +3,7 @@
 //! Note this doesn't enforce uniqueness of cells in the regions; use Unique_Region constraint(s) for that if necessary.
 
 regions: []const Region,
-        
+
 pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSolvable}!void {
     var min_sum: usize = 0;
     var max_sum: usize = std.math.maxInt(usize);

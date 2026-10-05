@@ -8,7 +8,7 @@ pub const White = base.Orthogonally_Adjacent_Dots(struct {
     }
 
     pub fn get_options(_: @This(), _: Params, _: *const Config, _: *State, _: Cell, has_dot: bool, adjacent_value: usize) Cell.Value_Options {
-        var options: Cell.Value_Options = .initEmpty();
+        var options: Cell.Value_Options = .empty;
 
         if (adjacent_value < 63) {
             options.set(adjacent_value + 1);
@@ -35,7 +35,7 @@ pub const Black = base.Orthogonally_Adjacent_Dots(struct {
     }
 
     pub fn get_options(_: @This(), _: Params, _: *const Config, _: *State, _: Cell, has_dot: bool, adjacent_value: usize) Cell.Value_Options {
-        var options: Cell.Value_Options = .initEmpty();
+        var options: Cell.Value_Options = .empty;
 
         if (adjacent_value < 32) {
             options.set(adjacent_value * 2);

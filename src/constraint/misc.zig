@@ -4,7 +4,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
     // e.g. 2/3 and 4/6 "consume" the same ratio
     unique_ratios: bool = false,
 
-    const Permutations = std.bit_set.ArrayBitSet(usize, 64 * 64);
+    const Permutations = std.bit_set.Array(usize, 64 * 64);
 
     fn permutation_index(self: @This(), a: usize, b: usize) usize {
         std.debug.assert(a < 64);
@@ -24,7 +24,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
     pub fn evaluate(self: @This(), params: base.Orthogonally_Adjacent_Dots_Params, config: *const Config, state: *State) error{NotSolvable}!void {
         var result: State.Solve_Status = .unsolved;
 
-        var permutations: Permutations = .initEmpty();
+        var permutations: Permutations = .empty;
 
         var iter = params.rect.iterator(.forward);
         while (iter.next()) |cell| {
@@ -66,7 +66,7 @@ pub const Unique_Pairs_Rect = base.Orthogonally_Adjacent_Dots(struct {
 
         if (result == .not_solvable) return error.NotSolvable;
     }
-    
+
     fn check_and_collect_permutation(self: @This(), config: *const Config, state: *State, a: Cell, b: Cell, permutations: *Permutations) error{NotSolvable}!void {
         const a_options = state.get(config, a);
         const b_options = state.get(config, b);

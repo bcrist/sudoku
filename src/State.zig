@@ -3,7 +3,7 @@ modified: bool,
 
 pub fn init(allocator: std.mem.Allocator, num_cells: usize) !State {
     const cells = try allocator.alloc(Cell.Value_Options, num_cells);
-    @memset(cells, .initFull());
+    @memset(cells, .full);
     return .{
         .cells = cells,
         .modified = false,
@@ -12,7 +12,7 @@ pub fn init(allocator: std.mem.Allocator, num_cells: usize) !State {
 
 pub fn init_empty(allocator: std.mem.Allocator, num_cells: usize) !State {
     const cells = try allocator.alloc(Cell.Value_Options, num_cells);
-    @memset(cells, .initEmpty());
+    @memset(cells, .empty);
     return .{
         .cells = cells,
         .modified = false,
@@ -49,8 +49,8 @@ pub fn status(self: State) Solve_Status {
 
 pub fn get(self: State, config: *const Config, cell: Cell) Cell.Value_Options {
     const index = config.cell_index(cell);
-    const raw = index.maybe_raw() orelse return .initEmpty();
-    if (raw >= self.cells.len) return .initEmpty();
+    const raw = index.maybe_raw() orelse return .empty;
+    if (raw >= self.cells.len) return .empty;
     return self.cells[raw];
 }
 
@@ -58,7 +58,7 @@ pub fn set(self: *State, config: *const Config, cell: Cell, value: u6) void {
     const index = config.cell_index(cell);
     const raw = index.maybe_raw() orelse return;
     if (raw >= self.cells.len) return;
-    var options: Cell.Value_Options = .initEmpty();
+    var options: Cell.Value_Options = .empty;
     options.set(value);
     if (!self.cells[raw].eql(options)) {
         self.cells[raw] = options;
@@ -90,8 +90,8 @@ pub fn set_union(self: *State, config: *const Config, cell: Cell, options: Cell.
 
 pub fn intersect(self: *State, config: *const Config, cell: Cell, options: Cell.Value_Options) Cell.Value_Options {
     const index = config.cell_index(cell);
-    const raw = index.maybe_raw() orelse return .initEmpty();
-    if (raw >= self.cells.len) return .initEmpty();
+    const raw = index.maybe_raw() orelse return .empty;
+    if (raw >= self.cells.len) return .empty;
     const old = self.cells[raw];
     const new = old.intersectWith(options);
     if (!new.eql(old)) {
@@ -101,9 +101,9 @@ pub fn intersect(self: *State, config: *const Config, cell: Cell, options: Cell.
     return new;
 }
 
-pub fn debug(self: State, config: *const Config, writer: *std.io.Writer) !void {
-    for (config.bounds.min.y .. config.bounds.max.y + 1) |y| {
-        for (config.bounds.min.x .. config.bounds.max.x + 1) |x| {
+pub fn debug(self: State, config: *const Config, writer: *std.Io.Writer) !void {
+    for (config.bounds.min.y..config.bounds.max.y + 1) |y| {
+        for (config.bounds.min.x..config.bounds.max.x + 1) |x| {
             const options = self.get(config, .init(x, y));
             try writer.writeByte(Cell.debug_options(options));
         }
@@ -111,11 +111,11 @@ pub fn debug(self: State, config: *const Config, writer: *std.io.Writer) !void {
     }
 }
 
-pub fn debug_full(self: State, config: *const Config, writer: *std.io.Writer) !void {
-    for (config.bounds.min.y .. config.bounds.max.y + 1) |y| {
-        for (config.bounds.min.x .. config.bounds.max.x + 1) |x| {
+pub fn debug_full(self: State, config: *const Config, writer: *std.Io.Writer) !void {
+    for (config.bounds.min.y..config.bounds.max.y + 1) |y| {
+        for (config.bounds.min.x..config.bounds.max.x + 1) |x| {
             const options = self.get(config, .init(x, y));
-            try writer.print("{b:0>10} ", .{ options.mask });
+            try writer.print("{b:0>10} ", .{options.mask});
         }
         try writer.writeByte('\n');
     }
@@ -139,7 +139,7 @@ pub fn solve(self: *State, allocator: std.mem.Allocator, config: *const Config, 
             std.crypto.random.int(u64),
             std.crypto.random.int(u64),
             std.crypto.random.int(u64),
-        }};
+        } };
         const rnd = rng.random();
 
         while (true) {
@@ -164,7 +164,6 @@ pub fn solve(self: *State, allocator: std.mem.Allocator, config: *const Config, 
                 },
             };
         }
-
     } else {
         self.solve_wrapped(allocator, config, @TypeOf(ctx), &wrapped, null) catch |err| switch (err) {
             error.StopSolving => {},
@@ -197,7 +196,7 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
 
         try ctx.on_evaluation(config, self.*);
     }
-    
+
     switch (self.status()) {
         .solved => try ctx.on_solution(config, self.*),
         .not_solvable => try ctx.on_backtrack(config, self.*, error.NotSolvable),
@@ -220,11 +219,10 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
 
             try ctx.on_bifurcation(config, self.*, count);
 
-            var selection: Cell.Value_Options = .initEmpty();
+            var selection: Cell.Value_Options = .empty;
             selection.set(v);
             self.cells[unsolved_cell] = selection;
             try self.solve_wrapped(allocator, config, Inner, ctx, rnd);
-
         } else {
             var snapshot = try self.clone(allocator);
             defer snapshot.deinit(allocator);
@@ -240,7 +238,7 @@ fn solve_wrapped(self: *State, allocator: std.mem.Allocator, config: *const Conf
             var iter = options.iterator(.{});
             while (iter.next()) |v| {
                 @memcpy(self.cells, snapshot.cells);
-                var selection: Cell.Value_Options = .initEmpty();
+                var selection: Cell.Value_Options = .empty;
                 selection.set(v);
                 self.cells[first_unsolved_cell] = selection;
                 try self.solve_wrapped(allocator, config, Inner, ctx, null);

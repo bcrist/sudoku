@@ -2,7 +2,7 @@
 pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
     return struct {
         const Self = @This();
-       
+
         params: Orthogonally_Adjacent_Dots_Params,
         impl: Impl,
 
@@ -136,9 +136,9 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
         fn update_cell_options(self: Self, config: *const Config, state: *State, cell: Cell, has_dot: bool, adjacent_value: usize) void {
             _ = state.intersect(config, cell, self.impl.get_options(self.params, config, state, cell, has_dot, adjacent_value));
         }
-    
+
         fn update_cell_options_multi(self: Self, config: *const Config, state: *State, cell: Cell, has_dot: bool, adjacent_options: Cell.Value_Options) void {
-            var new_options: Cell.Value_Options = .initEmpty();
+            var new_options: Cell.Value_Options = .empty;
             var iter = adjacent_options.iterator(.{});
             while (iter.next()) |adjacent_value| {
                 new_options.setUnion(self.impl.get_options(self.params, config, state, cell, has_dot, adjacent_value));
@@ -147,21 +147,21 @@ pub fn Orthogonally_Adjacent_Dots(comptime Impl: type) type {
         }
     };
 }
- pub const Orthogonally_Adjacent_Dots_Params = struct {
+pub const Orthogonally_Adjacent_Dots_Params = struct {
     rect: Rect,
-    horizontal_dots: std.DynamicBitSetUnmanaged,
-    vertical_dots: std.DynamicBitSetUnmanaged,
+    horizontal_dots: std.bit_set.Dynamic,
+    vertical_dots: std.bit_set.Dynamic,
     evaluate_mutual_options: bool, // disabling this will result in more bifurcation/backtracking, but may end up being faster overall
 
     pub fn init(allocator: std.mem.Allocator, rect: Rect, default_evaluate_mutual_options: bool) !Orthogonally_Adjacent_Dots_Params {
-        var horizontal_dots: std.DynamicBitSetUnmanaged = try .initEmpty(allocator, (rect.width() - 1) * rect.height());
+        var horizontal_dots: std.bit_set.Dynamic = try .initEmpty(allocator, (rect.width() - 1) * rect.height());
         errdefer horizontal_dots.deinit(allocator);
 
-        var vertical_dots: std.DynamicBitSetUnmanaged = try .initEmpty(allocator, (rect.height() - 1) * rect.width());
+        var vertical_dots: std.bit_set.Dynamic = try .initEmpty(allocator, (rect.height() - 1) * rect.width());
         errdefer vertical_dots.deinit(allocator);
 
         return .{
-            .rect = rect, 
+            .rect = rect,
             .horizontal_dots = horizontal_dots,
             .vertical_dots = vertical_dots,
             .evaluate_mutual_options = default_evaluate_mutual_options,
@@ -221,7 +221,7 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
         while (iter.next()) |cell| {
             var options = if (has_last_options) iter.last_options else state.get(config, cell);
             const value = options.findFirstSet() orelse 0;
-            options = .initEmpty();
+            options = .empty;
             options.set(value);
             _ = state.intersect(config, cell, options);
         }
@@ -233,7 +233,7 @@ pub fn evaluate_sum_cells(config: *const Config, state: *State, iterator: anytyp
         while (iter.next()) |cell| {
             var options = if (has_last_options) iter.last_options else state.get(config, cell);
             const value = options.findLastSet() orelse 0;
-            options = .initEmpty();
+            options = .empty;
             options.set(value);
             _ = state.intersect(config, cell, options);
         }

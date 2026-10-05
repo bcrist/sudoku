@@ -2,11 +2,11 @@
 //! These regions can be ordered from smallest to largest, based on the value of the first cell in the region.
 //! If two regions have the same value for the first cell, then the second cell will be compared, etc.
 //! If a region is smaller than the one it is being compared to and therefore doesn't have a cell to compare, consider the missing cell to be a 0.
-//! 
+//!
 //! Note this constraint never eliminates any values from the board, it only validates solutions once all regions have been fully solved.
 //! There are some cases where we could make deductions before that, but in general, this constraint tends to only be meaningful late in a solve,
 //! so the earlier we can bail out the better.
-//! 
+//!
 //! TODO: may be able to do better without too much work - if every region is not known, but has a uniquely known prefix, then we already know the total order, even if we don't know every digit of the regions.
 //! similarly, we may know a partial order if some regions start with the same digit/prefix; we can still make deductions about the rank of regions that start with a different rank/prefix.  Use a bitmask to track which regions we know have a proven rank.
 
@@ -47,7 +47,7 @@ pub fn num_regions(self: Ranked_Regions) usize {
 pub fn get_region(self: Ranked_Regions, region: usize) Region {
     return self.buf_region[region];
 }
-        
+
 pub fn evaluate(self: Ranked_Regions, config: *const Config, state: *State) error{NotSolvable}!void {
     const n = self.region_count;
 
@@ -100,7 +100,7 @@ const Sort_Context = struct {
                 if (a_value != b_value) return a_value < b_value;
             } else break;
         }
-        
+
         return false; // equal
     }
 };

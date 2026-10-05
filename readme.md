@@ -118,7 +118,7 @@ As mentioned above, the default solver does not handle severely under-constraine
 
 ## Values, Cells, Rects, and Regions
 
-The [`sudoku.Cell`](./src/Cell.zig) struct acts as a reference to a particular cell in the puzzle (i.e. the things that you write a number into in standard sudoku).  The state of each cell is represented by a 64-bit `std.bit_set.IntegerBitSet`.  This means that puzzles can have up to 64 distinct symbols (i.e. digits).  By convention, the first ten bits (i.e. the least significant bits) represent the digits 0-9, so that arithmetic constraints don't need to do any mapping between symbol indices and values.
+The [`sudoku.Cell`](./src/Cell.zig) struct acts as a reference to a particular cell in the puzzle (i.e. the things that you write a number into in standard sudoku).  The state of each cell is represented by a 64-bit `std.bit_set.Integer`.  This means that puzzles can have up to 64 distinct symbols (i.e. digits).  By convention, the first ten bits (i.e. the least significant bits) represent the digits 0-9, so that arithmetic constraints don't need to do any mapping between symbol indices and values.
 
 Cells are assumed to be located on a 2D grid, and usually they will be in a square or rectangular pattern, so the [`sudoku.Rect`](./src/Rect.zig) struct can be used to refer to any finite rectangle on the infinite, virtual "board".  Cells within the rect can be iterated using `rect.iterator()`.
 

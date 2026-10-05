@@ -37,26 +37,26 @@ pub fn offset(self: Cell, x: i32, y: i32) ?Cell {
 
 pub fn neighbor(self: Cell, direction: Direction) ?Cell {
     return switch (direction) {
-        .north     => self.offset( 0, -1),
-        .northeast => self.offset( 1, -1),
-        .east      => self.offset( 1,  0),
-        .southeast => self.offset( 1,  1),
-        .south     => self.offset( 0,  1),
-        .southwest => self.offset(-1,  1),
-        .west      => self.offset(-1,  0),
+        .north => self.offset(0, -1),
+        .northeast => self.offset(1, -1),
+        .east => self.offset(1, 0),
+        .southeast => self.offset(1, 1),
+        .south => self.offset(0, 1),
+        .southwest => self.offset(-1, 1),
+        .west => self.offset(-1, 0),
         .northwest => self.offset(-1, -1),
     };
 }
 
 pub fn options(debug: []const u8) Value_Options {
-    var o: Value_Options = .initEmpty();
+    var o: Value_Options = .empty;
     for (debug) |ch| switch (ch) {
         '0'...'9' => o.set(ch - '0'),
         'a'...'z' => o.set(ch - 'a' + 10),
         'A'...'Z' => o.set(ch - 'A' + 36),
         '@' => o.set(62),
         '#' => o.set(63),
-        else => o = .initFull(),
+        else => o = .full,
     };
     return o;
 }
@@ -82,7 +82,7 @@ pub fn debug_options(o: Value_Options) u8 {
 
 pub const origin: Cell = .init(0, 0);
 
-pub const Value_Options = std.bit_set.IntegerBitSet(64);
+pub const Value_Options = std.bit_set.Integer(64);
 
 pub const Iteration_Direction = enum {
     forward, // left-to-right, top-to-bottom
@@ -100,22 +100,22 @@ pub const Direction = enum {
     northwest,
 };
 
-pub const Index = enum (u32) {
+pub const Index = enum(u32) {
     invalid = 0xFFFF_FFFF,
     _,
 
     pub fn init(i: usize) Index {
-        return @enumFromInt(i);
+        return @fromBackingInt(@intCast(i));
     }
 
     pub fn maybe_raw(self: Index) ?u32 {
         if (self == .invalid) return null;
-        return @intFromEnum(self);
+        return @backingInt(self);
     }
 
     pub fn raw(self: Index) u32 {
         std.debug.assert(self != .invalid);
-        return @intFromEnum(self);
+        return @backingInt(self);
     }
 };
 

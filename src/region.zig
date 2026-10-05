@@ -1,4 +1,4 @@
-pub const Region = union (enum) {
+pub const Region = union(enum) {
     single_rect: Rect,
     multi_rect: []const Rect,
 

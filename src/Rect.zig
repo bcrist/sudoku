@@ -70,8 +70,7 @@ pub fn expand_bounds(self: Rect, bounds: *Rect) void {
 }
 
 pub fn contains(self: Rect, cell: Cell) bool {
-    return self.min.x <= cell.x and self.max.x >= cell.x
-        and self.min.y <= cell.y and self.max.y >= cell.y;
+    return self.min.x <= cell.x and self.max.x >= cell.x and self.min.y <= cell.y and self.max.y >= cell.y;
 }
 
 pub fn iterator(self: Rect, dir: Cell.Iteration_Direction) Iterator {

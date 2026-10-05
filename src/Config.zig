@@ -91,7 +91,7 @@ pub fn init_cells(self: *Config, cell_data: []const u8) void {
             cell.x = self.bounds.min.x;
             cell.y += 1;
         } else {
-            self.initial_state.set_options(self, cell, Cell.options(&.{ ch }));
+            self.initial_state.set_options(self, cell, Cell.options(&.{ch}));
             cell.x += 1;
         }
     }

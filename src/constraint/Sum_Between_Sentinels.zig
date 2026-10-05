@@ -37,7 +37,7 @@ fn iterator(self: Sum_Between_Sentinels, config: *const Config, state: *const St
         .config = config,
         .state = state,
         .summing = self.sum_before_first_sentinel,
-        .last_options = .initEmpty(),
+        .last_options = .empty,
         .abort = false,
     };
 }
@@ -54,13 +54,13 @@ const Iterator = struct {
     pub fn next(self: *Iterator) ?Cell {
         while (self.inner.next()) |cell| {
             const options = self.state.get(self.config, cell);
-            if (options.intersectWith(self.sentinels).eql(.initEmpty())) {
+            if (options.intersectWith(self.sentinels).eql(.empty)) {
                 // This cell is a non-sentinel; we either need to sum it or skip it depending on the mode.
                 if (self.summing) {
                     self.last_options = options;
                     return cell;
                 }
-            } else if (options.intersectWith(self.sentinels.complement()).eql(.initEmpty())) {
+            } else if (options.intersectWith(self.sentinels.complement()).eql(.empty)) {
                 // This cell has no options other than to be a sentinel; toggle summing behavior
                 self.summing = !self.summing;
             } else {

@@ -38,40 +38,40 @@ pub fn evaluate(self: @This(), config: *const Config, state: *State) error{NotSo
 
             if (self.knight) {
                 self.evaluate_adjacency(config, state, value, cell.offset(-2, -1));
-                self.evaluate_adjacency(config, state, value, cell.offset(-2,  1));
-                self.evaluate_adjacency(config, state, value, cell.offset( 2, -1));
-                self.evaluate_adjacency(config, state, value, cell.offset( 2,  1));
-                self.evaluate_adjacency(config, state, value, cell.offset(-1,  2));
-                self.evaluate_adjacency(config, state, value, cell.offset( 1, -2));
-                self.evaluate_adjacency(config, state, value, cell.offset( 1,  2));
+                self.evaluate_adjacency(config, state, value, cell.offset(-2, 1));
+                self.evaluate_adjacency(config, state, value, cell.offset(2, -1));
+                self.evaluate_adjacency(config, state, value, cell.offset(2, 1));
+                self.evaluate_adjacency(config, state, value, cell.offset(-1, 2));
+                self.evaluate_adjacency(config, state, value, cell.offset(1, -2));
+                self.evaluate_adjacency(config, state, value, cell.offset(1, 2));
             }
 
             if (self.king or self.rook) {
-                self.evaluate_adjacency(config, state, value, cell.offset(-1,  0));
-                self.evaluate_adjacency(config, state, value, cell.offset( 1,  0));
-                self.evaluate_adjacency(config, state, value, cell.offset( 0, -1));
-                self.evaluate_adjacency(config, state, value, cell.offset( 0,  1));
+                self.evaluate_adjacency(config, state, value, cell.offset(-1, 0));
+                self.evaluate_adjacency(config, state, value, cell.offset(1, 0));
+                self.evaluate_adjacency(config, state, value, cell.offset(0, -1));
+                self.evaluate_adjacency(config, state, value, cell.offset(0, 1));
             }
 
             if (self.king or self.bishop) {
                 self.evaluate_adjacency(config, state, value, cell.offset(-1, -1));
-                self.evaluate_adjacency(config, state, value, cell.offset(-1,  1));
-                self.evaluate_adjacency(config, state, value, cell.offset( 1, -1));
-                self.evaluate_adjacency(config, state, value, cell.offset( 1,  1));
+                self.evaluate_adjacency(config, state, value, cell.offset(-1, 1));
+                self.evaluate_adjacency(config, state, value, cell.offset(1, -1));
+                self.evaluate_adjacency(config, state, value, cell.offset(1, 1));
             }
 
             if (self.bishop) {
                 self.evaluate_direction(config, state, value, cell.offset(-2, -2), -1, -1);
-                self.evaluate_direction(config, state, value, cell.offset(-2,  2), -1,  1);
-                self.evaluate_direction(config, state, value, cell.offset( 2, -2),  1, -1);
-                self.evaluate_direction(config, state, value, cell.offset( 2,  2),  1,  1);
+                self.evaluate_direction(config, state, value, cell.offset(-2, 2), -1, 1);
+                self.evaluate_direction(config, state, value, cell.offset(2, -2), 1, -1);
+                self.evaluate_direction(config, state, value, cell.offset(2, 2), 1, 1);
             }
 
             if (self.rook) {
-                self.evaluate_direction(config, state, value, cell.offset(-2,  0), -1,  0);
-                self.evaluate_direction(config, state, value, cell.offset( 2,  0),  1,  0);
-                self.evaluate_direction(config, state, value, cell.offset( 0, -2),  0, -1);
-                self.evaluate_direction(config, state, value, cell.offset( 0,  2),  0,  1);
+                self.evaluate_direction(config, state, value, cell.offset(-2, 0), -1, 0);
+                self.evaluate_direction(config, state, value, cell.offset(2, 0), 1, 0);
+                self.evaluate_direction(config, state, value, cell.offset(0, -2), 0, -1);
+                self.evaluate_direction(config, state, value, cell.offset(0, 2), 0, 1);
             }
         }
     }
@@ -90,7 +90,7 @@ fn evaluate_adjacency(self: Anti_Chess_Region, config: *const Config, state: *St
     const cell = maybe_cell orelse return;
     if (!self.region.contains(cell)) return;
 
-    var new_options: Cell.Value_Options = .initFull();
+    var new_options: Cell.Value_Options = .full;
     new_options.unset(anti_value);
     _ = state.intersect(config, cell, new_options);
 }

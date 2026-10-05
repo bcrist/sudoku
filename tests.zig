@@ -43,7 +43,7 @@ test "standard sudoku (easy)" {
         \\72   6 4 
         \\    7  25
     );
-    
+
     const result = try config.solve(std.testing.allocator, .no_backtracks);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -81,7 +81,7 @@ test "standard sudoku (hard)" {
         \\ 21  9   
         \\  6  2   
     );
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -112,8 +112,8 @@ test "https://www.youtube.com/watch?v=Nbp5FRyACmA" {
     try b.add_square_columns(4);
     try b.add_boxes_4x4();
     try b.add(.{ .sum_region = .init(17, .single(.{ .width = 1, .height = 2, .offset = .init(2, 2) })) });
-    try b.add(.{ .sum_region = .init( 6, .single(.{ .width = 1, .height = 2, .offset = .init(3, 1) })) });
-    try b.add(.{ .sum_region = .init( 5, .single(.{ .width = 1, .height = 2, .offset = .init(4, 2) })) });
+    try b.add(.{ .sum_region = .init(6, .single(.{ .width = 1, .height = 2, .offset = .init(3, 1) })) });
+    try b.add(.{ .sum_region = .init(5, .single(.{ .width = 1, .height = 2, .offset = .init(4, 2) })) });
 
     var white_kropki: sudoku.Constraint.kropki.White = try .init(std.testing.allocator, board);
     defer white_kropki.deinit(std.testing.allocator);
@@ -135,7 +135,7 @@ test "https://www.youtube.com/watch?v=Nbp5FRyACmA" {
     try b.add(.{ .unique_pairs_rect = unique_ratios });
 
     var config = try b.build();
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -150,7 +150,7 @@ test "https://www.youtube.com/watch?v=Nbp5FRyACmA" {
 test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
     // This test runs pretty slowly (expected since the intended solve path involves coloring the whole board)
     // It only takes a few seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
-    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+    if (@import("builtin").optimize == .debug) return error.SkipZigTest;
 
     var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
     defer arena.deinit();
@@ -186,7 +186,7 @@ test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
     }) });
 
     var config = try b.build();
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -206,7 +206,7 @@ test "https://www.youtube.com/watch?v=YTsn0cEJ_TY" {
 test "https://www.youtube.com/watch?v=9dXrnS0KVAw" {
     // This test runs pretty slowly
     // It only takes around 5 seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
-    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+    if (@import("builtin").optimize == .debug) return error.SkipZigTest;
 
     var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
     defer arena.deinit();
@@ -231,12 +231,12 @@ test "https://www.youtube.com/watch?v=9dXrnS0KVAw" {
     try b.add(.{ .sum_region = .init(12, try b.region_along_line(board_region, .init(6, 9), .northeast)) });
     try b.add(.{ .sum_region = .init(11, try b.region_along_line(board_region, .init(7, 9), .northeast)) });
 
-    try b.add(.{ .sum_region = .init( 9, try b.region_along_line(board_region, .init(1, 7), .southeast)) });
+    try b.add(.{ .sum_region = .init(9, try b.region_along_line(board_region, .init(1, 7), .southeast)) });
     try b.add(.{ .sum_region = .init(13, try b.region_along_line(board_region, .init(1, 8), .southeast)) });
     try b.add(.{ .sum_region = .init(66, try b.region_along_line(board_region, .init(1, 2), .southeast)) });
 
     var config = try b.build();
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -268,7 +268,7 @@ test "https://www.youtube.com/watch?v=NddLgz4loUE" {
     // diagonal sums (little killer)
     try b.add(.{ .sum_region = .init(10, try b.region_along_line(board_region, .init(3, 1), .southwest)) });
     try b.add(.{ .sum_region = .init(12, try b.region_along_line(board_region, .init(4, 1), .southwest)) });
-    try b.add(.{ .sum_region = .init( 9, try b.region_along_line(board_region, .init(9, 3), .northwest)) });
+    try b.add(.{ .sum_region = .init(9, try b.region_along_line(board_region, .init(9, 3), .northwest)) });
     try b.add(.{ .sum_region = .init(14, try b.region_along_line(board_region, .init(9, 4), .northwest)) });
     try b.add(.{ .sum_region = .init(14, try b.region_along_line(board_region, .init(1, 7), .southeast)) });
 
@@ -279,10 +279,10 @@ test "https://www.youtube.com/watch?v=NddLgz4loUE" {
     try b.add_thermo(.init(9, 4), &.{ .north, .north, .west });
     try b.add_thermo(.init(9, 7), &.{ .west, .north });
     try b.add_thermo(.init(5, 8), &.{ .north, .west });
-    try b.add_thermo(.init(9, 8), &.{ .south });
+    try b.add_thermo(.init(9, 8), &.{.south});
 
     var config = try b.build();
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -302,7 +302,7 @@ test "https://www.youtube.com/watch?v=NddLgz4loUE" {
 test "https://www.youtube.com/watch?v=AvEL10Hx8JY" {
     // This test runs pretty slowly
     // It only takes around 5 seconds to solve on my machine when compiled with ReleaseSafe or ReleaseFast, but it takes about 10x longer in Debug mode.
-    if (@import("builtin").mode == .Debug) return error.SkipZigTest;
+    if (@import("builtin").optimize == .debug) return error.SkipZigTest;
 
     var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
     defer arena.deinit();
@@ -327,7 +327,7 @@ test "https://www.youtube.com/watch?v=AvEL10Hx8JY" {
     try b.add_arrow(.init(1, 9), &.{ .north, .east, .east });
 
     var config = try b.build();
-    
+
     const result = try config.solve(std.testing.allocator, .default);
     defer result.solution.?.deinit(std.testing.allocator);
     try check_solution(&config, result,
@@ -366,17 +366,15 @@ test "standard sudoku details" {
         \\    7  25
     );
 
-    var temp: std.ArrayList(u8) = .empty;
-    defer temp.deinit(std.testing.allocator);
-
-    var writer = temp.writer(std.testing.allocator).adaptToNewApi(&.{});
+    var writer: std.Io.Writer.Allocating = .init(std.testing.allocator);
+    defer writer.deinit();
 
     var state = config.initial_state;
 
     try config.constraints[0].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 1111111110 1111111110 1000000000 1111111110 1111111110 1111111110 1111111110 
         \\1111111110 0000100000 1111111110 0000001000 1111111110 1111111110 1111111110 0000000010 0010000000 
@@ -388,7 +386,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1111111110 1111111110 1111111110 0001000000 1111111110 0000010000 1111111110 
         \\1111111110 1111111110 1111111110 1111111110 0010000000 1111111110 1111111110 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // column constraints
     try config.constraints[10].evaluate(&config, &state);
@@ -401,8 +399,8 @@ test "standard sudoku details" {
     try config.constraints[17].evaluate(&config, &state);
     try config.constraints[18].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 1011111010 1011110110 1000000000 1100111110 1110011110 0001001000 0101010110 
         \\1101010010 0000100000 1011111010 0000001000 0101110000 1100111110 1110011110 0000000010 0010000000 
@@ -414,7 +412,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1011111010 1011110110 0101110000 0001000000 1110011110 0000010000 0101010110 
         \\1101010010 0100001000 1011111010 1011110110 0010000000 1100111110 1110011110 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // row constraints
     try config.constraints[1].evaluate(&config, &state);
@@ -427,8 +425,8 @@ test "standard sudoku details" {
     try config.constraints[8].evaluate(&config, &state);
     try config.constraints[9].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 0010110010 0010110010 1000000000 0100110010 0110010010 0000001000 0100010010 
         \\1101010000 0000100000 1001010000 0000001000 0101010000 1100010100 1100010100 0000000010 0010000000 
@@ -440,7 +438,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1000101010 1000100010 0100100000 0001000000 1100001010 0000010000 0100000010 
         \\1101010010 0100001000 1001011010 1001010010 0010000000 1100011010 1100011010 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // box constraints
     try config.constraints[19].evaluate(&config, &state);
@@ -453,8 +451,8 @@ test "standard sudoku details" {
     try config.constraints[26].evaluate(&config, &state);
     try config.constraints[27].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 0010010000 0010100010 1000000000 0100100010 0100010000 0000001000 0100010000 
         \\1000010000 0000100000 1000010000 0000001000 0101000000 0100000000 1100010100 0000000010 0010000000 
@@ -466,7 +464,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1000100010 1000100000 0100100000 0001000000 0100001010 0000010000 0100000010 
         \\1001000010 0000001000 1001000010 1000010000 0010000000 1100011000 0100001010 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // column constraints
     try config.constraints[10].evaluate(&config, &state);
@@ -501,8 +499,8 @@ test "standard sudoku details" {
     try config.constraints[26].evaluate(&config, &state);
     try config.constraints[27].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 0010010000 0000100010 1000000000 0000100010 0100010000 0000001000 0100010000 
         \\1000010000 0000100000 1000010000 0000001000 0001000000 0100000000 0000010100 0000000010 0010000000 
@@ -514,7 +512,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1000000010 0000100000 0100100000 0001000000 0100001010 0000010000 0100000010 
         \\0001000010 0000001000 0001000010 0000010000 0010000000 1000000000 0100000010 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // column constraints
     try config.constraints[10].evaluate(&config, &state);
@@ -549,8 +547,8 @@ test "standard sudoku details" {
     try config.constraints[26].evaluate(&config, &state);
     try config.constraints[27].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 0010010000 0000000010 1000000000 0000100000 0100010000 0000001000 0100010000 
         \\1000010000 0000100000 1000010000 0000001000 0001000000 0100000000 0000010100 0000000010 0010000000 
@@ -562,7 +560,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1000000000 0000100000 0100000000 0001000000 0000001000 0000010000 0000000010 
         \\0001000010 0000001000 0001000010 0000010000 0010000000 1000000000 0100000000 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     // column constraints
     try config.constraints[10].evaluate(&config, &state);
@@ -597,8 +595,8 @@ test "standard sudoku details" {
     try config.constraints[26].evaluate(&config, &state);
     try config.constraints[27].evaluate(&config, &state);
 
-    temp.clearRetainingCapacity();
-    try state.debug_full(&config, &writer.new_interface);
+    writer.clearRetainingCapacity();
+    try state.debug_full(&config, &writer.writer);
     try std.testing.expectEqualStrings(
         \\0000000100 0001000000 0010000000 0000000010 1000000000 0000100000 0000010000 0000001000 0100000000 
         \\1000000000 0000100000 0000010000 0000001000 0001000000 0100000000 0000000100 0000000010 0010000000 
@@ -610,7 +608,7 @@ test "standard sudoku details" {
         \\0010000000 0000000100 1000000000 0000100000 0100000000 0001000000 0000001000 0000010000 0000000010 
         \\0000000010 0000001000 0001000000 0000010000 0010000000 1000000000 0100000000 0000000100 0000100000 
         \\
-        , temp.items);
+    , writer.written());
 
     try std.testing.expect(state.status() == .solved);
 }
@@ -626,17 +624,17 @@ fn check_solution(config: *const sudoku.Config, result: sudoku.Config.Solve_Resu
             \\ Evaluations: {}
             \\
             \\
-            , .{
-                result.context.counters.solutions,
-                result.context.counters.max_depth,
-                result.context.counters.backtracks,
-                result.context.counters.bifurcations,
-                result.context.counters.evaluations,
-            });
+        , .{
+            result.context.counters.solutions,
+            result.context.counters.max_depth,
+            result.context.counters.backtracks,
+            result.context.counters.bifurcations,
+            result.context.counters.evaluations,
+        });
 
         if (result.solution) |solution| {
             var buf: [64]u8 = undefined;
-            var stderr = std.fs.File.stderr().writerStreaming(&buf);
+            var stderr = std.Io.File.stderr().writer(std.testing.io, &buf);
             solution.debug(config, &stderr.interface) catch {};
             stderr.interface.writeByte('\n') catch {};
             stderr.interface.flush() catch {};
@@ -645,7 +643,7 @@ fn check_solution(config: *const sudoku.Config, result: sudoku.Config.Solve_Resu
         }
     }
 
-    var w: std.io.Writer.Allocating = .init(std.testing.allocator);
+    var w: std.Io.Writer.Allocating = .init(std.testing.allocator);
     defer w.deinit();
     if (result.solution) |solution| {
         try solution.debug(config, &w.writer);
@@ -780,7 +778,7 @@ test "Region iterator" {
     try std.testing.expectEqual(sudoku.Cell.init(3, 1), iter.next().?);
     try std.testing.expectEqual(sudoku.Cell.init(2, 1), iter.next().?);
     try std.testing.expectEqual(sudoku.Cell.init(1, 1), iter.next().?);
-    
+
     try std.testing.expectEqual(null, iter.next());
 }
 
@@ -841,7 +839,7 @@ test "Unique_Region constraint" {
 
 test "Ascending_Cells.get_ascending_options" {
     const get_options = sudoku.Constraint.Ascending_Cells.get_ascending_options;
-    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.initEmpty()).mask);
+    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.empty).mask);
     try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111110, get_options(.{ .mask = 1 }).mask);
     try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111000, get_options(.{ .mask = 0b100 }).mask);
     try std.testing.expectEqual(0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111000, get_options(.{ .mask = 0b100001110111000000111100 }).mask);
@@ -850,7 +848,7 @@ test "Ascending_Cells.get_ascending_options" {
 
 test "Ascending_Cells.get_descending_options" {
     const get_options = sudoku.Constraint.Ascending_Cells.get_descending_options;
-    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.initEmpty()).mask);
+    try std.testing.expectEqual(0xFFFF_FFFF_FFFF_FFFF, get_options(.empty).mask);
     try std.testing.expectEqual(0, get_options(.{ .mask = 1 }).mask);
     try std.testing.expectEqual(0b11, get_options(.{ .mask = 0b100 }).mask);
     try std.testing.expectEqual(0b11111111111111111111111, get_options(.{ .mask = 0b100001110111000000111100 }).mask);

@@ -43,7 +43,7 @@ pub fn add_line(self: *Builder, direction: Cell.Direction, length: usize) !void 
     std.debug.assert(self.region_rects.items.len > 0);
     try self.region_rects.ensureUnusedCapacity(self.gpa, length);
     for (0..length) |_| {
-        const prev_rect = self.region_rects.getLast();
+        const prev_rect = self.region_rects.last().?;
         std.debug.assert(prev_rect.width() == 1 and prev_rect.height() == 1);
         const prev = prev_rect.min;
         try self.add_cell(prev.neighbor(direction) orelse unreachable);
@@ -52,7 +52,7 @@ pub fn add_line(self: *Builder, direction: Cell.Direction, length: usize) !void 
 
 pub fn add_line_within_region(self: *Builder, direction: Cell.Direction, region: Region) !void {
     std.debug.assert(self.region_rects.items.len > 0);
-    const prev_rect = self.region_rects.getLast();
+    const prev_rect = self.region_rects.last().?;
     std.debug.assert(prev_rect.width() == 1 and prev_rect.height() == 1);
 
     var bounds: Rect = .empty;
@@ -172,13 +172,13 @@ pub fn add_unique_diagonals(self: *Builder, dim: usize) !void {
 
 pub fn add_square_rows(self: *Builder, dim: usize) !void {
     try self.constraints.ensureUnusedCapacity(self.gpa, dim);
-    for (1 .. dim + 1) |row| {
+    for (1..dim + 1) |row| {
         self.constraints.appendAssumeCapacity(.{ .unique_region = .row(row, dim) });
     }
 }
 pub fn add_square_columns(self: *Builder, dim: usize) !void {
     try self.constraints.ensureUnusedCapacity(self.gpa, dim);
-    for (1 .. dim + 1) |row| {
+    for (1..dim + 1) |row| {
         self.constraints.appendAssumeCapacity(.{ .unique_region = .column(row, dim) });
     }
 }
